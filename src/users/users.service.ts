@@ -39,8 +39,9 @@ export class UsersService {
     return this.userRepository.findOne({ email: email });
   }
 
-  remove(user: User) {
-    this.userRepository.remove(user);
+  async remove(user: User) {
+    this.userRepository.removeAndFlush(user)
+
   }
 
   async changeEmail(changeEmailDto: ChangeEmailDto) {
