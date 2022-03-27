@@ -3,8 +3,10 @@ import { RegistrateUserDto } from './dto/registrate-user.dto';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../authentication/jwt-auth-guard';
 import { ChangeEmailDto } from './dto/change-email.dto';
+import { ChangeIdentityDto } from './dto/change-identity.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
-@UsePipes(ValidationPipe)
+@UsePipes(new ValidationPipe({ transform: true }))
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -20,7 +22,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Put(':uuid')
+  @Put(':uuid/email')
   @UseGuards(JwtAuthGuard)
   changeEmail(
     @Param('uuid') uuid: string,
@@ -29,6 +31,28 @@ export class UsersController {
     changeEmailDto.uuid = uuid;
 
     return this.usersService.changeEmail(changeEmailDto);
+  }
+
+  @Put(':uuid')
+  @UseGuards(JwtAuthGuard)
+  changeIdentity(
+    @Param('uuid') uuid: string,
+    @Body() changeIdentityDto: ChangeIdentityDto
+  ) {
+    changeIdentityDto.uuid = uuid;
+
+    return this.usersService.changeIdentity(changeIdentityDto);
+  }
+
+  @Put(':uuid/password')
+  @UseGuards(JwtAuthGuard)
+  changePassword(
+    @Param('uuid') uuid: string,
+    @Body() changePasswordDto: ChangePasswordDto
+  ) {
+    changePasswordDto.uuid = uuid;
+
+    return this.usersService.changePassword(changePasswordDto);
   }
 
   @Get(':uuid')
