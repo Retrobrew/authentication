@@ -1,5 +1,6 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Embedded, Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { randomUUID } from 'crypto';
+import { Credentials } from './credentials.entity';
 
 @Entity()
 export class User {
@@ -17,37 +18,51 @@ export class User {
   @Property()
   private lastname: string;
 
-  @Property()
-  private password: string;
+  @Embedded(
+    () => Credentials,
+    {
+      prefix: false
+    }
+  )
+  private credentials: Credentials;
 
   constructor(
     email: string,
     firstname: string,
     lastname: string,
-    password: string
+    credentials: Credentials,
   ) {
-    // Pas ouf à revoir
+    // Pas ouf à revoir : doit être l'orm/la bdd qui retourne l'identifiant
     this.uuid = randomUUID();
+
+    this.credentials = credentials;
     this.email = email;
     this.firstname = firstname;
     this.lastname = lastname;
-    this.password = password;
-  }
-
-  getPassword(): string {
-    return this.password;
   }
 
   changeEmail(email: string): void {
     this.email = email;
   }
 
-  static emptyUser(): User {
-    return new User(
-      "",
-      "",
-      "",
-      ""
-    )
+  changeFirstname(firstname: string): void {
+    this.firstname = firstname;
   }
+
+  changeLastname(lastname: string): void {
+    this.lastname = lastname;
+  }
+
+  getPassword(): string {
+    return this.credentials.getPassword();
+  }
+
+  async changePassword(newPassword: string): Promise<void> {
+    this.credentials.changePassword(newPassword)
+  }
+
+  getSalt(): string {
+    return this.credentials.getSalt()
+  }
+
 }

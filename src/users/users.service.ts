@@ -4,6 +4,10 @@ import { User } from './entities/user.entity';
 import { EntityRepository } from '@mikro-orm/core';
 import { RegistrateUserDto } from './dto/registrate-user.dto';
 import { ChangeEmailDto } from './dto/change-email.dto';
+import { ChangeIdentityDto } from './dto/change-identity.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { Credentials } from './entities/credentials.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -14,11 +18,15 @@ export class UsersService {
   ) {}
 
   async registrate(registrateUserDto: RegistrateUserDto) {
+    const salt = bcrypt.genSalt();
+    const password = bcrypt.hash(registrateUserDto.password, await salt);
+
+    const credentials = new Credentials(await password, await salt);
     const user = new User(
       registrateUserDto.email,
       registrateUserDto.firstname,
       registrateUserDto.lastname,
-      registrateUserDto.password
+      credentials
     );
 
     // this.userRepository.registrate(user);
@@ -40,8 +48,7 @@ export class UsersService {
   }
 
   async remove(user: User) {
-    this.userRepository.removeAndFlush(user)
-
+    await this.userRepository.removeAndFlush(user)
   }
 
   async changeEmail(changeEmailDto: ChangeEmailDto) {
@@ -50,4 +57,35 @@ export class UsersService {
       this.userRepository.persistAndFlush(user);
     })
   }
+
+  async changeIdentity(changeIdentityDto: ChangeIdentityDto){
+    let user = await this.findOneByUuid(changeIdentityDto.uuid);
+
+    if(!(user instanceof User)){
+      throw new Error("User not found");
+    }
+
+    user.changeFirstname(changeIdentityDto.firstname);
+    user.changeLastname(changeIdentityDto.lastname);
+
+    await this.userRepository.persistAndFlush(user);
+  }
+
+  async changePassword(changePasswordDto: ChangePasswordDto){
+    let user = await this.findOneByUuid(changePasswordDto.uuid);
+
+    if(!(user instanceof User)){
+      throw new Error("User not found");
+    }
+
+    const hashedPassword = await bcrypt.hash(
+      changePasswordDto.password,
+      user.getSalt()
+    )
+
+    await user.changePassword(hashedPassword);
+
+    await this.userRepository.persistAndFlush(user);
+  }
+
 }
