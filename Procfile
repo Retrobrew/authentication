@@ -1,2 +1,2 @@
-release: npx mikro-orm schema:update -d
+release: npx mikro-orm schema:update -r
 web: npm run start:prod
