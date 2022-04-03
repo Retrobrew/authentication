@@ -3,7 +3,7 @@ import { RegistrateUserDto } from './dto/registrate-user.dto';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../authentication/jwt-auth-guard';
 import { ChangeEmailDto } from './dto/change-email.dto';
-import { ChangeIdentityDto } from './dto/change-identity.dto';
+import { ChangeUsernameDto } from './dto/change-username.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -37,11 +37,11 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   changeIdentity(
     @Param('uuid') uuid: string,
-    @Body() changeIdentityDto: ChangeIdentityDto
+    @Body() changeUsernameDto: ChangeUsernameDto
   ) {
-    changeIdentityDto.uuid = uuid;
+    changeUsernameDto.uuid = uuid;
 
-    return this.usersService.changeIdentity(changeIdentityDto);
+    return this.usersService.changeUsername(changeUsernameDto);
   }
 
   @Put(':uuid/password')

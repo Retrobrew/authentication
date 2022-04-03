@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { LoginAuthenticationDto } from './dto/login-authentication.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -10,16 +11,20 @@ export class AuthenticationService {
     private readonly usersService: UsersService
   ) {}
 
-  async authenticateUser(email: string, password: string): Promise<Object | null> {
-    const user = await this.usersService.findOneByEmail(email);
-    const isMatch = await bcrypt.compare(password, user.getPassword()); // faire la vérif ailleurs : dans VO Credentials ?
-
-    if(user && isMatch) {
-      // Renvoyer l'utilisateur sans mot de passe
-      // const { password, ...result } = user;
-
-      return user;
-    }
+  async authenticateUser(loginDto: LoginAuthenticationDto): Promise<Object | null> {
+    this.usersService.findOneByEmail(loginDto.email).then(user => {
+      if(!user) {
+        throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST)
+      }
+      bcrypt.compare(loginDto.password, user.getPassword()).then(isMatch => {
+        if(!isMatch) {
+          throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST)
+        }
+        // Renvoyer l'utilisateur sans mot de passe
+        // const { password, ...result } = user;
+        return user; // passer par un DTO ou une view
+      });
+    });
 
     return null;
   }

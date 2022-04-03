@@ -9,12 +9,7 @@ export class RegistrateUserDto {
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value.trim())
   @IsString()
-  firstname: string;
-
-  @IsNotEmpty()
-  @Transform(({ value }: TransformFnParams) => value.trim())
-  @IsString()
-  lastname: string;
+  username: string;
 
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value.trim())

@@ -11,16 +11,19 @@ export class LocalStrategy extends PassportStrategy(Strategy) { // LoginStrategy
     super({ usernameField: 'email' });
   }
 
-  //login : obg de s'appeler validate
+  // obg de s'appeler validate
   async validate(email: string, password: string): Promise<any> {
     const loginAuthenticationDto: LoginAuthenticationDto = new LoginAuthenticationDto(
       email,
       password
     );
-    const user = await this.authService.authenticateUser(email, password);
+
+    const user = await this.authService.authenticateUser(loginAuthenticationDto);
+
     if (!user) {
       throw new UnauthorizedException();
     }
+
     return user;
   }
 }

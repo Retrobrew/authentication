@@ -1,20 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from './entities/user.entity';
-import { EntityRepository } from '@mikro-orm/core';
 import { RegistrateUserDto } from './dto/registrate-user.dto';
 import { ChangeEmailDto } from './dto/change-email.dto';
-import { ChangeIdentityDto } from './dto/change-identity.dto';
+import { ChangeUsernameDto } from './dto/change-username.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Credentials } from './entities/credentials.entity';
 import * as bcrypt from 'bcrypt';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    // Permet d'avoir un repository basique : pas custom
     @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>
+    private readonly userRepository: UserRepository
   ) {}
 
   async registrate(registrateUserDto: RegistrateUserDto) {
@@ -24,13 +23,11 @@ export class UsersService {
     const credentials = new Credentials(await password, await salt);
     const user = new User(
       registrateUserDto.email,
-      registrateUserDto.firstname,
-      registrateUserDto.lastname,
+      registrateUserDto.username,
       credentials
     );
 
-    // this.userRepository.registrate(user);
-    await this.userRepository.persistAndFlush(user);
+    this.userRepository.persistAndFlush(user);
 
     return user;
   }
@@ -44,7 +41,7 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ email: email });
+    return this.userRepository.findByEmail(email);
   }
 
   async remove(user: User) {
@@ -58,15 +55,14 @@ export class UsersService {
     })
   }
 
-  async changeIdentity(changeIdentityDto: ChangeIdentityDto){
-    let user = await this.findOneByUuid(changeIdentityDto.uuid);
+  async changeUsername(changeUsernameDto: ChangeUsernameDto){
+    let user = await this.findOneByUuid(changeUsernameDto.uuid);
 
     if(!(user instanceof User)){
       throw new Error("User not found");
     }
 
-    user.changeFirstname(changeIdentityDto.firstname);
-    user.changeLastname(changeIdentityDto.lastname);
+    user.changeUsername(changeUsernameDto.username);
 
     await this.userRepository.persistAndFlush(user);
   }

@@ -1,8 +1,9 @@
 import { Embedded, Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { randomUUID } from 'crypto';
 import { Credentials } from './credentials.entity';
+import { UserRepository } from '../user.repository';
 
-@Entity()
+@Entity({ customRepository: () => UserRepository })
 export class User {
   // [EntityRepositoryType]?: UserRepository;
 
@@ -13,10 +14,7 @@ export class User {
   private email: string;
 
   @Property()
-  private firstname: string;
-
-  @Property()
-  private lastname: string;
+  private username: string;
 
   @Embedded(
     () => Credentials,
@@ -28,8 +26,7 @@ export class User {
 
   constructor(
     email: string,
-    firstname: string,
-    lastname: string,
+    username: string,
     credentials: Credentials,
   ) {
     // Pas ouf à revoir : doit être l'orm/la bdd qui retourne l'identifiant
@@ -37,20 +34,15 @@ export class User {
 
     this.credentials = credentials;
     this.email = email;
-    this.firstname = firstname;
-    this.lastname = lastname;
+    this.username = username;
   }
 
   changeEmail(email: string): void {
     this.email = email;
   }
 
-  changeFirstname(firstname: string): void {
-    this.firstname = firstname;
-  }
-
-  changeLastname(lastname: string): void {
-    this.lastname = lastname;
+  changeUsername(lastname: string): void {
+    this.username = lastname;
   }
 
   getPassword(): string {
