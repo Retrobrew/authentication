@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -12,15 +12,19 @@ export class AuthenticationService {
   ) {}
 
   async authenticateUser(loginDto: LoginAuthenticationDto): Promise<Object | null> {
-    const user = await this.usersService.findOneByEmail(loginDto.email);
-    const isMatch = await bcrypt.compare(loginDto.password, user.getPassword());
-
-    if(user && isMatch) {
-      // Renvoyer l'utilisateur sans mot de passe
-      // const { password, ...result } = user;
-
-      return user;
-    }
+    this.usersService.findOneByEmail(loginDto.email).then(user => {
+      if(!user) {
+        throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST)
+      }
+      bcrypt.compare(loginDto.password, user.getPassword()).then(isMatch => {
+        if(!isMatch) {
+          throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST)
+        }
+        // Renvoyer l'utilisateur sans mot de passe
+        // const { password, ...result } = user;
+        return user; // passer par un DTO ou une view
+      });
+    });
 
     return null;
   }
