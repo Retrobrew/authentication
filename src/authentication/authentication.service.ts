@@ -3,6 +3,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginAuthenticationDto } from './dto/login-authentication.dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -12,21 +13,17 @@ export class AuthenticationService {
   ) {}
 
   async authenticateUser(loginDto: LoginAuthenticationDto): Promise<Object | null> {
-    this.usersService.findOneByEmail(loginDto.email).then(user => {
-      if(!user) {
-        throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST)
-      }
-      bcrypt.compare(loginDto.password, user.getPassword()).then(isMatch => {
-        if(!isMatch) {
-          throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST)
-        }
-        // Renvoyer l'utilisateur sans mot de passe
-        // const { password, ...result } = user;
-        return user; // passer par un DTO ou une view
-      });
-    });
+    let user: User = await this.usersService.findOneByEmail(loginDto.email);
+    if(!user) {
+      throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST)
+    }
 
-    return null;
+    let isMatch = await bcrypt.compare(loginDto.password, user.getPassword());
+    if(!isMatch) {
+      throw new HttpException('Incorrect email or password', HttpStatus.BAD_REQUEST)
+    }
+
+    return user;
   }
 
   async login(user: any) {
