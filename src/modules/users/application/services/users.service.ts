@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { User } from './entities/user.entity';
-import { RegistrateUserDto } from './dto/registrate-user.dto';
-import { ChangeEmailDto } from './dto/change-email.dto';
-import { ChangeUsernameDto } from './dto/change-username.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { Credentials } from './entities/credentials.entity';
+import { User } from '../../domain/entities/user.entity';
+import { RegistrateUserDto } from '../dto/registrate-user.dto';
+import { ChangeEmailDto } from '../dto/change-email.dto';
+import { ChangeUsernameDto } from '../dto/change-username.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto';
+import { Credentials } from '../../domain/entities/credentials.entity';
 import * as bcrypt from 'bcrypt';
-import { UserRepository } from './user.repository';
+import { UserRepository } from '../user.repository';
 
 @Injectable()
 export class UsersService {

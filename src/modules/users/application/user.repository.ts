@@ -1,5 +1,5 @@
 import { EntityRepository } from '@mikro-orm/mysql';
-import { User } from './entities/user.entity';
+import { User } from '../domain/entities/user.entity';
 
 export class UserRepository extends EntityRepository<User> {
   public findByEmail(email: string): Promise<User> {
