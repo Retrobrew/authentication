@@ -1,7 +1,7 @@
 import { Embedded, Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { randomUUID } from 'crypto';
 import { Credentials } from './credentials.entity';
-import { UserRepository } from '../user.repository';
+import { UserRepository } from '../../application/user.repository';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {

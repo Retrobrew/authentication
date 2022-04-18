@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, Put, UsePipes, ValidationPipe } from '@nestjs/common';
-import { RegistrateUserDto } from './dto/registrate-user.dto';
-import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../authentication/jwt-auth-guard';
-import { ChangeEmailDto } from './dto/change-email.dto';
-import { ChangeUsernameDto } from './dto/change-username.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
+import { RegistrateUserDto } from '../application/dto/registrate-user.dto';
+import { UsersService } from '../application/services/users.service';
+import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
+import { ChangeEmailDto } from '../application/dto/change-email.dto';
+import { ChangeUsernameDto } from '../application/dto/change-username.dto';
+import { ChangePasswordDto } from '../application/dto/change-password.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('users')

@@ -8,7 +8,6 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    //ORM
     MikroOrmModule.forRoot(),
     //Pour pouvoir utiliser le .env
     ConfigModule.forRoot({
