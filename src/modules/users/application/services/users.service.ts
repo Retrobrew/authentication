@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../../domain/entities/user.entity';
-import { RegistrateUserDto } from '../dto/registrate-user.dto';
-import { ChangeEmailDto } from '../dto/change-email.dto';
-import { ChangeUsernameDto } from '../dto/change-username.dto';
-import { ChangePasswordDto } from '../dto/change-password.dto';
+import { RegistrateUserDto } from '../dto/user/registrate-user.dto';
+import { ChangeEmailDto } from '../dto/user/change-email.dto';
+import { ChangeUsernameDto } from '../dto/user/change-username.dto';
+import { ChangePasswordDto } from '../dto/user/change-password.dto';
 import { Credentials } from '../../domain/entities/credentials.entity';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../user.repository';
