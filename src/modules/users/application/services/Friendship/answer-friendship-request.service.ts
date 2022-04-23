@@ -17,31 +17,9 @@ export class AnswerFriendshipRequestService {
   ) {}
 
   async accept (answerDto: AnswerFriendshipRequestDto) {
-    const userUuid = answerDto.userUuid
-    const user: User = await this.userRepository.findOne({ uuid: userUuid })
+    const user: User = await this.getUser(answerDto.userUuid)
 
-    if (!user) {
-      Logger.error(
-        `Erreur lors de la récupération de l'utilisateur ${userUuid}`,
-        '',
-        this.constructor.name
-      )
-      throw new NotFoundException(`Utilisateur ${userUuid} inconnu`);
-    }
-
-    //Récupérer la requête
-    let friendshipRequest = user.getFriendRequests().getItems().find((request) => {
-      return request.getRecipient().getUuid() == user.getUuid();
-    })
-
-    if(!friendshipRequest) {
-      Logger.error(
-        `Erreur lors de la récupération de la demande d'ami ${answerDto.requestId}`,
-        '',
-        this.constructor.name
-      )
-      throw new BadRequestException(`Erreur lors de la récupération de la demande d'ami`);
-    }
+    let friendshipRequest = this.getFriendshipRequest(user, answerDto.requestId);
 
     if(friendshipRequest.getStatus() != FriendRequestStatus.PENDING) {
       Logger.error(
@@ -62,4 +40,72 @@ export class AnswerFriendshipRequestService {
 
     await this.userRepository.persistAndFlush([user, requester]);
   }
+
+  async decline(answerDto: AnswerFriendshipRequestDto){
+    //TODO ajouter un temps avant que requester puisse refaire une demande
+    const user: User        = await this.getUser(answerDto.userUuid);
+    const friendshipRequest = this.getSentFriendshipRequest(user, answerDto.requestId);
+
+    friendshipRequest.updateStatus(FriendRequestStatus.DECLINED);
+
+    await this.friendRequestRepository.persistAndFlush(friendshipRequest);
+
+  }
+
+  async cancel(answerDto: AnswerFriendshipRequestDto){
+    const user: User        = await this.getUser(answerDto.userUuid);
+    const friendshipRequest = this.getFriendshipRequest(user, answerDto.requestId);
+
+    await this.friendRequestRepository.removeAndFlush(friendshipRequest);
+  }
+
+  private getSentFriendshipRequest(user: User, requestId: number): FriendRequest {
+    let friendshipRequest = user.getSentFriendRequests().getItems().find((request) => {
+      return request.getId() == requestId;
+    })
+
+    if(!friendshipRequest) {
+      Logger.error(
+        `Erreur lors de la récupération de la demande d'ami ${requestId}`,
+        '',
+        this.constructor.name
+      )
+      throw new BadRequestException(`Erreur lors de la récupération de la demande d'ami`);
+    }
+
+    return friendshipRequest;
+  }
+
+  private getFriendshipRequest(user: User, requestId: number): FriendRequest {
+    let friendshipRequest = user.getFriendRequests().getItems().find((request) => {
+      return request.getId() == requestId;
+    })
+
+    if(!friendshipRequest) {
+      Logger.error(
+        `Erreur lors de la récupération de la demande d'ami ${requestId}`,
+        '',
+        this.constructor.name
+      )
+      throw new BadRequestException(`Erreur lors de la récupération de la demande d'ami`);
+    }
+
+    return friendshipRequest;
+  }
+
+  private async getUser(userUuid: string): Promise<User> {
+    let user = await this.userRepository.findOne({ uuid: userUuid })
+
+    if (!user) {
+      Logger.error(
+        `Erreur lors de la récupération de l'utilisateur ${userUuid}`,
+        '',
+        this.constructor.name
+      )
+      throw new NotFoundException(`Utilisateur ${userUuid} inconnu`);
+    }
+
+    return user;
+  }
+
 }

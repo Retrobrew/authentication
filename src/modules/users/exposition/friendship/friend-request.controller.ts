@@ -7,6 +7,7 @@ import { AnswerFriendshipRequestDto } from '../../application/dto/friendship/ans
 import {
   AnswerFriendshipRequestService
 } from '../../application/services/Friendship/answer-friendship-request.service';
+import { CancelFriendshipRequestDto } from '../../application/dto/friendship/cancel-friendship-request.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @UseGuards(JwtAuthGuard)
@@ -17,32 +18,55 @@ export class FriendRequestController {
     private readonly answerFriendshipRequestService: AnswerFriendshipRequestService
   ) {}
 
-  @Post(':uuid/friend/:friendUuid/request')
+  @Post(':uuid/friendRequest')
   requestFriendship(
     @Req() request: Request,
-    @Param('uuid') uuid: string, // potentiellement inutile
-    @Param('friendUuid') friendUuid: string
+    @Param('uuid') uuid: string
   ) {
-    console.log(request.user);
     const friendshipRequest = new RequestFriendshipDto(
-      uuid,
-      friendUuid
+      request.user["userId"],
+      uuid
     );
     return this.requestFriendshipService.friendshipRequest(friendshipRequest)
   }
 
-  @Post(':uuid/friendRequest/:requestId/accept')
+  @Post('friendRequest/received/:requestId/accept')
   acceptFriendship(
     @Req() request: Request,
-    @Param('uuid') uuid: string, // potentiellement inutile
     @Param('requestId') requestId: number
   ) {
     const answerFriendShipRequest = new AnswerFriendshipRequestDto(
-      uuid,
+      request.user["userId"],
       requestId
     );
 
     return this.answerFriendshipRequestService.accept(answerFriendShipRequest);
+  }
+
+  @Post('friendRequest/received/:requestId/decline')
+  declineFriendship(
+    @Req() request: Request,
+    @Param('requestId') requestId: number
+  ) {
+    const answerFriendShipRequest = new AnswerFriendshipRequestDto(
+      request.user["userId"],
+      requestId
+    );
+
+    return this.answerFriendshipRequestService.decline(answerFriendShipRequest);
+  }
+
+  @Post('friendRequest/sent/:requestId/cancel')
+  cancelFriendship(
+    @Req() request: Request,
+    @Param('requestId') requestId: number
+  ) {
+    const cancelFriendshipRequest = new CancelFriendshipRequestDto(
+      request.user["userId"],
+      requestId
+    );
+
+    return this.answerFriendshipRequestService.cancel(cancelFriendshipRequest);
   }
 
 }
