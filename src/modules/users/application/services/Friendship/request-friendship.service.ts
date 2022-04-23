@@ -45,6 +45,12 @@ export class RequestFriendshipService {
       throw new BadRequestException("Opération non permise");
     }
 
+    await this.initialiseRequestCollection(user);
+
+    if(user.hasSentRequestTo(futurFriend)) {
+      throw new BadRequestException("Une demande a déjà été envoyée")
+    }
+
     const friendRequest = new FriendRequest(
       user,
       futurFriend,
@@ -56,7 +62,6 @@ export class RequestFriendshipService {
     user.getSentFriendRequests().add(friendRequest);
     futurFriend.getFriendRequests().add(friendRequest);
 
-    await this.initialiseRequestCollection(user);
     await this.initialiseRequestCollection(futurFriend);
 
     return friendRequest.getId();

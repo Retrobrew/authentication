@@ -80,6 +80,12 @@ export class User {
     return this.sentRequests
   }
 
+  hasSentRequestTo(user: User): boolean {
+     return !!this.sentRequests.getItems().find((request) => {
+       return request.getRecipient().getUuid() == user.getUuid()
+     })
+  }
+
   isFriendWith(user: User): boolean {
     const friendship = this.friends.getItems().find((friendship) => {
       return friendship.getFriendB().uuid == user.uuid;
