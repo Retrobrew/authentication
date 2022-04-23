@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../../../domain/entities/user.entity';
 import { UserRepository } from '../../user.repository';
@@ -11,8 +11,8 @@ export class RequestFriendshipService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: UserRepository,
-  @InjectRepository(FriendRequest)
-  private readonly friendRequestRepository: EntityRepository<FriendRequest>
+    @InjectRepository(FriendRequest)
+    private readonly friendRequestRepository: EntityRepository<FriendRequest>
   ) {}
 
   async friendshipRequest(friendshipRequestDto: RequestFriendshipDto) {
@@ -42,9 +42,7 @@ export class RequestFriendshipService {
     await this.initialiseFriendsCollection(user);
 
     if(user.isFriendWith(futurFriend)) {
-      return;
-      // Lancer une erreur ou ok ?
-      // Opération non permise ?
+      throw new BadRequestException("Opération non permise");
     }
 
     const friendRequest = new FriendRequest(

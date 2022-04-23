@@ -35,4 +35,20 @@ export class FriendRequest {
   public getId(): number {
     return this.id;
   }
+
+  public getStatus(): string {
+    return this.status;
+  }
+
+  public getRecipient(): User {
+    return this.recipient;
+  }
+
+  public getRequester(): User {
+    return this.requester;
+  }
+
+  public updateStatus(status: string): void {
+    this.status = status;
+  }
 }

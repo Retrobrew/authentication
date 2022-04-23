@@ -92,4 +92,14 @@ export class User {
     return this.friends
   }
 
+  addFriend(friend: User) {
+    const startDate = new Date();
+    const friendship = new Friendship(
+      this,
+      friend,
+      startDate
+    );
+    this.friends.add(friendship);
+  }
+
 }
