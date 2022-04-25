@@ -17,7 +17,7 @@ export class RequestFriendshipService {
 
   async friendshipRequest(friendshipRequestDto: RequestFriendshipDto) {
     const userUuid   = friendshipRequestDto.userUuid
-    const user: User = await this.userRepository.findOne({ uuid: userUuid })
+    const user: User = await this.userRepository.findOne({ uuid: userUuid }, {populate: true})
 
     if(!user){
       Logger.error(
@@ -39,13 +39,10 @@ export class RequestFriendshipService {
       throw new NotFoundException(`Utilisateur ${friendUuid} inconnu`);
     }
 
-    await this.initialiseFriendsCollection(user);
-
     if(user.isFriendWith(futurFriend)) {
       throw new BadRequestException("Opération non permise");
     }
 
-    await this.initialiseRequestCollection(user);
 
     if(user.hasSentRequestTo(futurFriend)) {
       throw new BadRequestException("Une demande a déjà été envoyée")
@@ -57,29 +54,12 @@ export class RequestFriendshipService {
       new Date()
     );
 
-    await this.friendRequestRepository.persistAndFlush(friendRequest);
 
     user.getSentFriendRequests().add(friendRequest);
     futurFriend.getFriendRequests().add(friendRequest);
 
-    await this.initialiseRequestCollection(futurFriend);
+    this.userRepository.persistAndFlush([user, futurFriend])
 
     return friendRequest.getId();
   }
-
-  //TODO Trouver un meilleur moyen de le faire
-  private async initialiseRequestCollection(user: User) {
-    if(!user.getFriendRequests().isInitialized()) {
-      await user.getSentFriendRequests().init();
-      await user.getFriendRequests().init();
-    }
-  }
-
-  private async initialiseFriendsCollection(user: User) {
-    if(!user.getFriends().isInitialized()) {
-      await user.getFriends().init();
-    }
-  }
-
-
 }

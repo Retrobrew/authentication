@@ -16,7 +16,7 @@ export class AnswerFriendshipRequestService {
     private readonly friendRequestRepository: EntityRepository<FriendRequest>
   ) {}
 
-  async accept (answerDto: AnswerFriendshipRequestDto) {
+  async accept (answerDto: AnswerFriendshipRequestDto): Promise<void> {
     const user: User = await this.getUser(answerDto.userUuid)
 
     let friendshipRequest = this.getFriendshipRequest(user, answerDto.requestId);
@@ -94,7 +94,7 @@ export class AnswerFriendshipRequestService {
   }
 
   private async getUser(userUuid: string): Promise<User> {
-    let user = await this.userRepository.findOne({ uuid: userUuid })
+    let user = await this.userRepository.findOne({uuid: userUuid}, { populate: true })
 
     if (!user) {
       Logger.error(

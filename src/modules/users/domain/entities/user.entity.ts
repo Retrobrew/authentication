@@ -16,6 +16,15 @@ export class User {
   private email: string;
 
   @Property()
+  private dateOfBirth: Date;
+
+  @Property()
+  private sexe: string;
+
+  @Property()
+  private country: string;
+
+  @Property()
   private username: string;
 
   @Embedded(
@@ -40,9 +49,7 @@ export class User {
     username: string,
     credentials: Credentials,
   ) {
-    // Pas ouf à revoir : doit être l'orm/la bdd qui retourne l'identifiant
     this.uuid = randomUUID();
-
     this.credentials = credentials;
     this.email = email;
     this.username = username;
