@@ -1,19 +1,36 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Put, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+  Put,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { RegistrateUserDto } from '../application/dto/registrate-user.dto';
 import { UsersService } from '../application/services/users.service';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
 import { ChangeEmailDto } from '../application/dto/change-email.dto';
 import { ChangeUsernameDto } from '../application/dto/change-username.dto';
 import { ChangePasswordDto } from '../application/dto/change-password.dto';
+import { AuthenticationService } from '../../authentication/authentication.service';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthenticationService
+  ) {}
 
   @Post()
-  registrate(@Body() createUserDto: RegistrateUserDto) {
-    return this.usersService.registrate(createUserDto)
+  async registration(@Body() createUserDto: RegistrateUserDto) {
+    const newUser = await this.usersService.registrate(createUserDto);
+
+    return this.authService.login({ uuid: newUser.getUuid(), email: newUser.getEmail() })
   }
 
   @Get()

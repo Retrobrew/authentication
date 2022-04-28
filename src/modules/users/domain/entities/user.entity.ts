@@ -57,4 +57,12 @@ export class User {
     return this.credentials.getSalt()
   }
 
+  getUuid(): string {
+    return this.uuid;
+  }
+
+  getEmail(): string {
+    return this.email
+  }
+
 }
