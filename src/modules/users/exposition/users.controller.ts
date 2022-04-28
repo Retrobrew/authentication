@@ -8,14 +8,15 @@ import {
   UseGuards,
   Put,
   UsePipes,
-  ValidationPipe,
+  ValidationPipe
 } from '@nestjs/common';
-import { RegistrateUserDto } from '../application/dto/registrate-user.dto';
+import { RegistrateUserDto } from '../application/dto/user/registrate-user.dto';
 import { UsersService } from '../application/services/users.service';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
-import { ChangeEmailDto } from '../application/dto/change-email.dto';
-import { ChangeUsernameDto } from '../application/dto/change-username.dto';
-import { ChangePasswordDto } from '../application/dto/change-password.dto';
+import { ChangeEmailDto } from '../application/dto/user/change-email.dto';
+import { ChangeUsernameDto } from '../application/dto/user/change-username.dto';
+import { ChangePasswordDto } from '../application/dto/user/change-password.dto';
+
 import { AuthenticationService } from '../../authentication/authentication.service';
 
 @UsePipes(new ValidationPipe({ transform: true }))

@@ -1,7 +1,9 @@
-import { Embedded, Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Collection, Embedded, Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
 import { randomUUID } from 'crypto';
 import { Credentials } from './credentials.entity';
 import { UserRepository } from '../../application/user.repository';
+import { FriendRequest } from './friend-request.entity';
+import { Friendship } from './friendship.entity';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
@@ -14,6 +16,15 @@ export class User {
   private email: string;
 
   @Property()
+  private dateOfBirth: Date;
+
+  @Property()
+  private sexe: string;
+
+  @Property()
+  private country: string;
+
+  @Property()
   private username: string;
 
   @Embedded(
@@ -24,17 +35,32 @@ export class User {
   )
   private credentials: Credentials;
 
+  @OneToMany('FriendRequest', 'requester')
+  private sentRequests = new Collection<FriendRequest>(this);
+
+  @OneToMany('FriendRequest', 'recipient')
+  private receivedRequests = new Collection<FriendRequest>(this);
+
+  @OneToMany('Friendship', 'friendA')
+  private friends = new Collection<Friendship>(this);
+
   constructor(
     email: string,
     username: string,
     credentials: Credentials,
   ) {
-    // Pas ouf à revoir : doit être l'orm/la bdd qui retourne l'identifiant
     this.uuid = randomUUID();
-
     this.credentials = credentials;
     this.email = email;
     this.username = username;
+  }
+
+  getUuid(): string {
+    return this.uuid;
+  }
+
+  getEmail(): string {
+    return this.email
   }
 
   changeEmail(email: string): void {
@@ -57,12 +83,40 @@ export class User {
     return this.credentials.getSalt()
   }
 
-  getUuid(): string {
-    return this.uuid;
+  getFriendRequests() {
+    return this.receivedRequests
   }
 
-  getEmail(): string {
-    return this.email
+  getSentFriendRequests() {
+    return this.sentRequests
+  }
+
+  hasSentRequestTo(user: User): boolean {
+     return !!this.sentRequests.getItems().find((request) => {
+       return request.getRecipient().getUuid() == user.getUuid()
+     })
+  }
+
+  isFriendWith(user: User): boolean {
+    const friendship = this.friends.getItems().find((friendship) => {
+      return friendship.getFriendB().uuid == user.uuid;
+    });
+
+    return !!friendship;
+  }
+
+  getFriends() {
+    return this.friends
+  }
+
+  addFriend(friend: User) {
+    const startDate = new Date();
+    const friendship = new Friendship(
+      this,
+      friend,
+      startDate
+    );
+    this.friends.add(friendship);
   }
 
 }
