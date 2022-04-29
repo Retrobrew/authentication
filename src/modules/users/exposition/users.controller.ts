@@ -1,22 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
+  Get,
+  Param,
+  Post,
   Put,
+  UseGuards,
   UsePipes,
-  ValidationPipe
+  ValidationPipe,
 } from '@nestjs/common';
-import { RegistrateUserDto } from '../application/dto/user/registrate-user.dto';
+import { UserRegistrationDto } from '../application/dto/user/user-registration.dto';
 import { UsersService } from '../application/services/users.service';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
 import { ChangeEmailDto } from '../application/dto/user/change-email.dto';
 import { ChangeUsernameDto } from '../application/dto/user/change-username.dto';
 import { ChangePasswordDto } from '../application/dto/user/change-password.dto';
-
 import { AuthenticationService } from '../../authentication/authentication.service';
 
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -28,10 +28,17 @@ export class UsersController {
   ) {}
 
   @Post()
-  async registration(@Body() createUserDto: RegistrateUserDto) {
-    const newUser = await this.usersService.registrate(createUserDto);
+  async registration(
+    @Body() createUserDto: UserRegistrationDto
+  ) {
+    let newUser;
+    try {
+      newUser = await this.usersService.registrate(createUserDto);
+    } catch (error) {
+      throw new BadRequestException(error.message)
+    }
 
-    return this.authService.login({ uuid: newUser.getUuid(), email: newUser.getEmail() })
+    return await this.authService.login({ uuid: newUser.getUuid(), email: newUser.getEmail() });
   }
 
   @Get()

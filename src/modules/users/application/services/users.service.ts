@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../../domain/entities/user.entity';
-import { RegistrateUserDto } from '../dto/user/registrate-user.dto';
+import { UserRegistrationDto } from '../dto/user/user-registration.dto';
 import { ChangeEmailDto } from '../dto/user/change-email.dto';
 import { ChangeUsernameDto } from '../dto/user/change-username.dto';
 import { ChangePasswordDto } from '../dto/user/change-password.dto';
@@ -16,18 +16,26 @@ export class UsersService {
     private readonly userRepository: UserRepository
   ) {}
 
-  async registrate(registrateUserDto: RegistrateUserDto) {
-    const salt = bcrypt.genSalt();
-    const password = bcrypt.hash(registrateUserDto.password, await salt);
+  async registrate(registrationDto: UserRegistrationDto): Promise<User> {
+    let newUser = await this.userRepository.findByEmail(registrationDto.email);
+    if(newUser) {
+      throw new BadRequestException("Un compte avec cette adresse mail existe déjà");
+    }
 
+    const salt     = bcrypt.genSalt();
+    const password = bcrypt.hash(registrationDto.password, await salt);
+    const dateOfBirth = new Date(registrationDto.dateOfBirth);
     const credentials = new Credentials(await password, await salt);
     const user = new User(
-      registrateUserDto.email,
-      registrateUserDto.username,
+      registrationDto.email,
+      registrationDto.username,
+      dateOfBirth,
+      registrationDto.sexe,
+      registrationDto.country,
       credentials
     );
 
-    this.userRepository.persistAndFlush(user);
+    await this.userRepository.persistAndFlush(user);
 
     return user;
   }
