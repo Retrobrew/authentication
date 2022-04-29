@@ -10,11 +10,6 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req) {
-    // const loginDto: LoginAuthenticationDto = new LoginAuthenticationDto(
-    //   req.user.email,
-    //   req.user.password
-    // )
-
     return this.authService.login(req.user);
   }
 

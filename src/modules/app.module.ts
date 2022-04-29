@@ -9,7 +9,6 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     MikroOrmModule.forRoot(),
-    //Pour pouvoir utiliser le .env
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true

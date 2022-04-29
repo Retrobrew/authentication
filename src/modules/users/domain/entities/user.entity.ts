@@ -7,7 +7,6 @@ import { Friendship } from './friendship.entity';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
-  // [EntityRepositoryType]?: UserRepository;
 
   @PrimaryKey()
   private uuid: string;
@@ -15,7 +14,7 @@ export class User {
   @Property()
   private email: string;
 
-  @Property()
+  @Property({nullable: true})
   private dateOfBirth: Date;
 
   @Property()
@@ -47,16 +46,26 @@ export class User {
   constructor(
     email: string,
     username: string,
+    dateOfBirth: Date,
+    sexe: string,
+    country: string,
     credentials: Credentials,
   ) {
     this.uuid = randomUUID();
     this.credentials = credentials;
     this.email = email;
     this.username = username;
+    this.dateOfBirth = dateOfBirth;
+    this.sexe = sexe;
+    this.country = country;
   }
 
   getUuid(): string {
     return this.uuid;
+  }
+
+  getEmail(): string {
+    return this.email
   }
 
   changeEmail(email: string): void {
