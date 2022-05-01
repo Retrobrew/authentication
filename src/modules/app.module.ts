@@ -5,6 +5,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
+import { GroupsModule } from "./groups/groups.module";
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { ConfigModule } from '@nestjs/config';
       cache: true
     }),
     AuthenticationModule,
-    UsersModule
+    UsersModule,
+    GroupsModule
   ],
   controllers: [AppController],
   providers: [AppService],
