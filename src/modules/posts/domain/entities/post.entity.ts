@@ -1,0 +1,92 @@
+import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import { User } from '../../../users/domain/entities/user.entity';
+import { CreatePostDto } from '../../application/dto/create-post.dto';
+import { randomUUID } from 'crypto';
+import { CommentPostDto } from '../../application/dto/comment-post.dto';
+
+@Entity()
+export class Post {
+  @PrimaryKey()
+  private uuid: string;
+
+  @Property({ nullable: true })
+  private title?: string;
+
+  @ManyToOne()
+  private author: User;
+
+  @Property()
+  private content: string;
+
+  @Property({ nullable: true })
+  private media?: string;
+
+  @OneToMany('Post', 'parent')
+  private comments = new Collection<Post>(this);
+
+  @ManyToOne(() => Post,{ nullable: true })
+  private parent?: Post;
+
+  @Property()
+  private createdAt: Date;
+
+  @Property({ nullable: true })
+  private lastUpdatedAt?: Date;
+
+  private constructor(
+    author: User,
+    content: string,
+    createdAt: Date
+  ) {
+    this.uuid = randomUUID();
+    this.author = author;
+    this.content = content;
+    this.createdAt = createdAt;
+  }
+
+  static createPost(createPostDto: CreatePostDto): Post {
+    const post =  new Post(
+      createPostDto.author,
+      createPostDto.content,
+      createPostDto.createdAt
+    );
+    if(createPostDto.title) {
+      post.title = createPostDto.title;
+    }
+
+    return post;
+  }
+
+  static createComment(commentDto: CommentPostDto): Post {
+    const post = new Post(
+      commentDto.author,
+      commentDto.content,
+      commentDto.createdAt
+    );
+
+    post.parent = commentDto.parent;
+
+    return post;
+  }
+
+
+  getUuid(): string {
+    return this.uuid;
+  }
+
+  changeTitle(newTitle: string): void {
+    this.title = newTitle;
+  }
+
+  changeContent(changedContent: string): void {
+    this.content = changedContent;
+  }
+
+  getAuthor(): User {
+    return this.author;
+  }
+
+
+
+
+}
