@@ -1,7 +1,7 @@
 import {
   Body,
   Controller, Param,
-  Post,
+  Post, Put,
   Req,
   UseGuards,
   UsePipes,
@@ -9,9 +9,11 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
-import { CommentPostRequestDto } from '../application/dto/comment-post-request.dto';
+import { CommentPostRequestDto } from '../application/dto/comment/comment-post-request.dto';
 import { CommentsService } from '../application/services/comments.service';
-import { CommentPostDto } from '../application/dto/comment-post.dto';
+import { CommentPostDto } from '../application/dto/comment/comment-post.dto';
+import { EditCommentRequestDto } from '../application/dto/comment/edit-comment-request.dto';
+import { EditCommentDto } from '../application/dto/comment/edit-comment.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -37,6 +39,22 @@ export class CommentsController {
     );
 
     return this.commentsService.commentPost(commentPostDto);
+  }
+
+  @Put(":uuid/comment")
+  async editComment(
+    @Body() editCommentRequest: EditCommentRequestDto,
+    @Param('uuid') uuid: string,
+    @Req() req: Request
+  ): Promise<void> {
+    const editCommentDto = new EditCommentDto(
+      req.user["userId"],
+      editCommentRequest.parent,
+      editCommentRequest.content,
+      editCommentRequest.updatedAt
+    )
+
+    return this.commentsService.editComment(editCommentDto);
   }
 
 
