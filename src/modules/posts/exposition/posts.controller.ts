@@ -1,7 +1,7 @@
 import {
   BadRequestException,
   Body,
-  Controller, Param,
+  Controller, Get, Param,
   Post,
   Put,
   Req,
@@ -14,6 +14,7 @@ import { Request } from 'express';
 import { EditPostDto } from '../application/dto/edit-post.dto';
 import { PostsService } from '../application/services/posts.service';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
+import { Post as UserPost } from '../domain/entities/post.entity';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -52,6 +53,23 @@ export class PostsController {
     editPost.postUuid = uuid;
 
     return this.postsService.editPost(editPost)
+  }
+
+  @Get()
+  async getPosts(
+    @Req() req: Request
+  ) : Promise<Array<UserPost>> {
+    const user = req.user;
+    return this.postsService.getUserPosts(user["userId"]);
+  }
+
+  @Get(":uuid")
+  async getPost(
+    @Param('uuid') uuid: string,
+    @Req() req: Request
+  ): Promise<string> {
+    //TODO
+    return "retourne post " + uuid;
   }
 
 
