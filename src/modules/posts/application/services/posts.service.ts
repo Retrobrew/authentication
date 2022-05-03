@@ -1,7 +1,7 @@
 import { Post } from '../../domain/entities/post.entity';
-import { EditPostDto } from '../dto/edit-post.dto';
-import { CreatePostDto } from '../dto/create-post.dto';
-import { CreatePostRequestDto } from '../dto/create-post-request.dto';
+import { EditPostDto } from '../dto/post/edit-post.dto';
+import { CreatePostDto } from '../dto/post/create-post.dto';
+import { CreatePostRequestDto } from '../dto/post/create-post-request.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { BadRequestException } from '@nestjs/common';
 import { UsersService } from '../../../users/application/services/users.service';

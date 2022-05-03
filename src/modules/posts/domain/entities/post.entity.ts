@@ -1,6 +1,6 @@
 import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
 import { User } from '../../../users/domain/entities/user.entity';
-import { CreatePostDto } from '../../application/dto/create-post.dto';
+import { CreatePostDto } from '../../application/dto/post/create-post.dto';
 import { randomUUID } from 'crypto';
 import { PostRepository } from '../../application/post.repository';
 
@@ -85,6 +85,10 @@ export class Post {
 
   changeContent(changedContent: string): void {
     this.content = changedContent;
+  }
+
+  changeEditDate(editDate: Date): void {
+    this.lastUpdatedAt = editDate;
   }
 
   getAuthor(): User {

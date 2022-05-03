@@ -9,9 +9,9 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { CreatePostRequestDto } from '../application/dto/create-post-request.dto';
+import { CreatePostRequestDto } from '../application/dto/post/create-post-request.dto';
 import { Request } from 'express';
-import { EditPostDto } from '../application/dto/edit-post.dto';
+import { EditPostDto } from '../application/dto/post/edit-post.dto';
 import { PostsService } from '../application/services/posts.service';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
 import { Post as UserPost } from '../domain/entities/post.entity';
