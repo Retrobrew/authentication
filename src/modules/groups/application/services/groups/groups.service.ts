@@ -1,17 +1,23 @@
 import { EntityRepository } from "@mikro-orm/mysql";
 import { InjectRepository } from "@mikro-orm/nestjs";
-import { Logger, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { randomUUID } from "crypto";
 import { Groups } from "src/modules/groups/domain/entities/groups.entity";
+import { UsersService } from "src/modules/users/application/services/users.service";
 import { CreateGroupDto } from "../../dto/groups/create-group.dto";
 
-export class GroupService {
+@Injectable()
+export class GroupsService {
     constructor(
-        @InjectRepository(Groups) private readonly groupRepository: EntityRepository<Groups> 
+        @InjectRepository(Groups)
+        private readonly groupsRepository : EntityRepository<Groups>,
+        private readonly userService: UsersService
     ) {}
-
     
-    async createGroup(request : CreateGroupDto) : Promise<void> {
+    async create(request : CreateGroupDto): Promise<Groups> {
+
+        let user = await this.userService.findOneByUuid(request.userUuid)
+
         const group = new Groups(
             randomUUID(),
             request.name,
@@ -19,22 +25,13 @@ export class GroupService {
             new Date(),
             request.description,
             request.isProject,
-            request.createdBy
+            user
         )
-    }
 
-    private async getGroup(id: string): Promise<Groups> {
-        let group = await this.groupRepository.findOne({ uuid: id }, { populate: true });
-        if(!group) {
-            Logger.error(
-                `Erreur lors de la récupération du groupe ${id}`,
-                '',
-                this.constructor.name
-              );
-            throw new NotFoundException(`Groupe ${id} inconnu`)
-        }
+        await this.groupsRepository.persistAndFlush(group)
 
         return group;
+
     }
 
 }

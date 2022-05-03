@@ -1,5 +1,5 @@
 import { Entity, ManyToOne, OneToMany, PrimaryKey, Property } from "@mikro-orm/core";
-import { User } from "src/modules/users/domain/entities/user.entity";
+import { User } from "../../../users/domain/entities/user.entity";
 import { Groups } from "./groups.entity";
 
 @Entity()
