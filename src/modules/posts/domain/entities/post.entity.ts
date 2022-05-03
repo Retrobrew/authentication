@@ -2,18 +2,18 @@ import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '
 import { User } from '../../../users/domain/entities/user.entity';
 import { CreatePostDto } from '../../application/dto/create-post.dto';
 import { randomUUID } from 'crypto';
-import { CommentPostDto } from '../../application/dto/comment-post.dto';
+import { PostRepository } from '../../application/post.repository';
 
-@Entity()
+@Entity({ customRepository: () => PostRepository })
 export class Post {
   @PrimaryKey()
-  private uuid: string;
+  private readonly uuid: string;
 
   @Property({ nullable: true })
   private title?: string;
 
   @ManyToOne()
-  private author: User;
+  private readonly author: User;
 
   @Property()
   private content: string;
@@ -57,14 +57,19 @@ export class Post {
     return post;
   }
 
-  static createComment(commentDto: CommentPostDto): Post {
+  static createComment(
+    author: User,
+    parent: Post,
+    content: string,
+    createdAt: Date
+  ): Post {
     const post = new Post(
-      commentDto.author,
-      commentDto.content,
-      commentDto.createdAt
+      author,
+      content,
+      createdAt
     );
 
-    post.parent = commentDto.parent;
+    post.parent = parent;
 
     return post;
   }
@@ -84,6 +89,10 @@ export class Post {
 
   getAuthor(): User {
     return this.author;
+  }
+
+  isComment(): boolean {
+    return this.parent != undefined;
   }
 
 
