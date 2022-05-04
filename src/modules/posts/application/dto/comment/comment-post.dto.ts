@@ -1,7 +1,21 @@
+import { IsDate, IsNotEmpty } from 'class-validator';
+import { Transform, TransformFnParams } from 'class-transformer';
+
 export class CommentPostDto {
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value.trim())
   readonly author: string;
+
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value.trim())
   readonly parent: string;
+
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value.trim())
   readonly content: string;
+
+  @IsDate()
+  @IsNotEmpty()
   readonly createdAt: Date;
 
 
