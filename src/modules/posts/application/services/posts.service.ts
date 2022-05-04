@@ -1,7 +1,6 @@
 import { Post } from '../../domain/entities/post.entity';
 import { EditPostDto } from '../dto/post/edit-post.dto';
 import { CreatePostDto } from '../dto/post/create-post.dto';
-import { CreatePostRequestDto } from '../dto/post/create-post-request.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { BadRequestException } from '@nestjs/common';
 import { UsersService } from '../../../users/application/services/users.service';
@@ -15,19 +14,18 @@ export class PostsService {
     private readonly userRepository: UsersService
   ) {}
 
-  async createPost(createPostRequest: CreatePostRequestDto): Promise<string> {
-    const author = await this.userRepository.findOneByUuid(createPostRequest.authorId);
+  async createPost(createPostDto: CreatePostDto): Promise<string> {
+    const author = await this.userRepository.findOneByUuid(createPostDto.author);
     if(!author){
       throw new BadRequestException("Utilisateur inconnu");
     }
 
-    const createPostDto     =  new CreatePostDto();
-    createPostDto.author    = author;
-    createPostDto.createdAt = createPostRequest.createdAt;
-    createPostDto.content   = createPostRequest.content;
-    createPostDto.title     = createPostRequest.title;
-
-    const post = Post.createPost(createPostDto);
+    const post = Post.createPost(
+      author,
+      createPostDto.title,
+      createPostDto.content,
+      createPostDto.createdAt
+    );
 
     await this.postsRepository.persistAndFlush(post);
 

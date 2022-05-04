@@ -5,6 +5,7 @@ import { PostsController } from './exposition/posts.controller';
 import { PostsService } from './application/services/posts.service';
 import { UsersModule } from '../users/users.module';
 import { CommentsController } from './exposition/comments.controller';
+import { CommentsService } from './application/services/comments.service';
 
 
 @Module({
@@ -18,7 +19,7 @@ import { CommentsController } from './exposition/comments.controller';
   ],
   providers: [
     PostsService,
-    CommentsController
+    CommentsService
   ]
 })
 export class PostsModule{}

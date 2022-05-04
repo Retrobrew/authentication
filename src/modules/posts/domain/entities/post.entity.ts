@@ -1,6 +1,5 @@
 import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
 import { User } from '../../../users/domain/entities/user.entity';
-import { CreatePostDto } from '../../application/dto/post/create-post.dto';
 import { randomUUID } from 'crypto';
 import { PostRepository } from '../../application/post.repository';
 
@@ -44,14 +43,19 @@ export class Post {
     this.createdAt = createdAt;
   }
 
-  static createPost(createPostDto: CreatePostDto): Post {
+  static createPost(
+    author: User,
+    title: string,
+    content: string,
+    createdAt: Date,
+  ): Post {
     const post =  new Post(
-      createPostDto.author,
-      createPostDto.content,
-      createPostDto.createdAt
+      author,
+      content,
+      createdAt
     );
-    if(createPostDto.title) {
-      post.title = createPostDto.title;
+    if(title) {
+      post.title = title;
     }
 
     return post;

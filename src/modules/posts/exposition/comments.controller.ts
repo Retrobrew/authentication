@@ -26,14 +26,14 @@ export class CommentsController {
   @Post(":uuid/comment")
   async commentPost(
     @Body() commentPostRequest: CommentPostRequestDto,
-    @Param('uuid') uuid: string,
+    @Param('uuid') postId: string,
     @Req() req: Request
   ): Promise<string> {
     const user = req.user;
 
     const commentPostDto = new CommentPostDto(
       user["userId"],
-      commentPostRequest.parent,
+      postId,
       commentPostRequest.content,
       commentPostRequest.createdAt
     );
@@ -41,15 +41,15 @@ export class CommentsController {
     return this.commentsService.commentPost(commentPostDto);
   }
 
-  @Put(":uuid/comment")
+  @Put(":postId/comment/:uuid")
   async editComment(
     @Body() editCommentRequest: EditCommentRequestDto,
-    @Param('uuid') uuid: string,
+    @Param('uuid') comment: string,
     @Req() req: Request
   ): Promise<void> {
     const editCommentDto = new EditCommentDto(
       req.user["userId"],
-      editCommentRequest.parent,
+      comment,
       editCommentRequest.content,
       editCommentRequest.updatedAt
     )

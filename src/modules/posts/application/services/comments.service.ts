@@ -20,7 +20,7 @@ export class CommentsService {
     if(!user) {
       throw new BadRequestException("Utilisateur inconnus")
     }
-
+    console.log("Parent: " + commentPostDto.parent);
     const post = await this.postsRepository.findOne({uuid: commentPostDto.parent});
     if(!post){
       throw new BadRequestException("Cette publication n'existe pas")
@@ -47,7 +47,7 @@ export class CommentsService {
     const comment = await this.postsRepository.findOne({uuid: editCommentDto.comment});
 
     if(!comment) {
-      throw new BadRequestException("Utilisateur inconnu");
+      throw new BadRequestException("Pas un commentaire");
     }
     const userIsAuthor: boolean = comment.getAuthor().getUuid() == user.getUuid();
 

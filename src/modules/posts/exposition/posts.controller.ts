@@ -15,6 +15,7 @@ import { EditPostDto } from '../application/dto/post/edit-post.dto';
 import { PostsService } from '../application/services/posts.service';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
 import { Post as UserPost } from '../domain/entities/post.entity';
+import { CreatePostDto } from '../application/dto/post/create-post.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -30,12 +31,13 @@ export class PostsController {
     @Body() createPostRequest: CreatePostRequestDto,
     @Req() req : Request
   ): Promise<string> {
-    const user = req.user;
-    if(user["userId"] != createPostRequest.authorId) {
-      throw new BadRequestException("Utilisateur connecté et créateur du post différent");
-    }
+    const createPostDto     =  new CreatePostDto();
+    createPostDto.author    = req.user["userId"];
+    createPostDto.createdAt = createPostRequest.createdAt;
+    createPostDto.content   = createPostRequest.content;
+    createPostDto.title     = createPostRequest.title;
 
-    return this.postsService.createPost(createPostRequest);
+    return this.postsService.createPost(createPostDto);
   }
 
   @Put(":uuid")
