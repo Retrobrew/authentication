@@ -1,6 +1,12 @@
-export class EditPostDto {
+import { IsDate, IsString } from 'class-validator';
+
+export class EditPostRequestDto {
+  @IsString()
   readonly changedTitle: string;
+
+  @IsString()
   readonly changedContent: string;
+
+  @IsDate()
   readonly dateOfUpdate: Date;
-  readonly authorId: string;
 }

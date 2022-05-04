@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller, Get, Param,
   Post,
@@ -16,6 +15,7 @@ import { PostsService } from '../application/services/posts.service';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
 import { Post as UserPost } from '../domain/entities/post.entity';
 import { CreatePostDto } from '../application/dto/post/create-post.dto';
+import { EditPostRequestDto } from '../application/dto/post/edit-post-request.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -42,19 +42,19 @@ export class PostsController {
 
   @Put(":uuid")
   async editPost(
-    @Body() editPost: EditPostDto,
+    @Body() editPostRequest: EditPostRequestDto,
     @Req() req: Request,
-    @Param('uuid') uuid: string,
+    @Param('uuid') post: string,
   ): Promise<void> {
-    const user = req.user;
+    const editPostDto = new EditPostDto(
+      editPostRequest.changedTitle,
+      editPostRequest.changedContent,
+      editPostRequest.dateOfUpdate,
+      req.user["userId"],
+      post
+  );
 
-    if(user["userId"] != editPost.authorId) {
-      throw new BadRequestException("Modification impossible");
-    }
-
-    editPost.postUuid = uuid;
-
-    return this.postsService.editPost(editPost)
+    return this.postsService.editPost(editPostDto)
   }
 
   @Get()
