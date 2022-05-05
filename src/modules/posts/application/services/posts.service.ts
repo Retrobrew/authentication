@@ -6,6 +6,7 @@ import { BadRequestException } from '@nestjs/common';
 import { UsersService } from '../../../users/application/services/users.service';
 import { PostRepository } from '../post.repository';
 import { User } from '../../../users/domain/entities/user.entity';
+import { DeletePostDto } from '../dto/post/delete-post.dto';
 
 export class PostsService {
   constructor(
@@ -74,8 +75,28 @@ export class PostsService {
     return this.postsRepository.findOne({uuid: postId});
   }
 
+  async deletePost(deletePostDto: DeletePostDto): Promise<void> {
+    const user = await this.userRepository.findOneByUuid(deletePostDto.authorId);
+    if(!user) {
+      throw new BadRequestException("Utilisateur inconnu");
+    }
+
+    const post = await this.postsRepository.findOne({uuid: deletePostDto.postId});
+    if(!post) {
+      throw new BadRequestException("Publication non trouvée");
+    }
+
+    // à voir après avec les droits de modérations et les posts dans les groupes
+    if(post.getAuthor().getUuid() != user.getUuid()) {
+      throw new BadRequestException("Impossible de supprimer le post d'un autre utilisateur")
+    }
+
+    await this.postsRepository.removeAndFlush(post);
+  }
+
   async getUserFeed(userId: string): Promise<void> {
-    const user: User = await this.userRepository.findOneByUuid(userId);
+    //TODO
+    const user: User = await this.userRepository.findOneByUuid("d7ddd4b6-84bb-4b6d-8cc1-179e1fea1699");
 
     this.postsRepository.getUserFeed(user).then((res) => {
 

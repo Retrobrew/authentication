@@ -1,6 +1,6 @@
 import {
   Body,
-  Controller, Get, Param,
+  Controller, Delete, Get, Param,
   Post,
   Put,
   Req,
@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
 import { Post as UserPost } from '../domain/entities/post.entity';
 import { CreatePostDto } from '../application/dto/post/create-post.dto';
 import { EditPostRequestDto } from '../application/dto/post/edit-post-request.dto';
+import { DeletePostDto } from '../application/dto/post/delete-post.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -67,11 +68,23 @@ export class PostsController {
 
   @Get(":uuid")
   async getPost(
+    @Param('uuid') postId: string,
+    @Req() req: Request
+  ): Promise<UserPost> {
+    return this.postsService.getPost(postId);
+  }
+
+  @Delete(":uuid")
+  async deletePost(
     @Param('uuid') uuid: string,
     @Req() req: Request
-  ): Promise<string> {
-    //TODO
-    return "retourne post " + uuid;
+  ): Promise<void> {
+    const deletePostDto = new DeletePostDto(
+      req.user["userId"],
+      uuid
+    );
+
+    return this.postsService.deletePost(deletePostDto);
   }
 
 
