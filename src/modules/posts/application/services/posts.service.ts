@@ -81,7 +81,7 @@ export class PostsService {
       throw new BadRequestException("Utilisateur inconnu");
     }
 
-    const post = await this.postsRepository.findOne({uuid: deletePostDto.postId});
+    const post = await this.postsRepository.findOne({ uuid: deletePostDto.postId }, { populate: true });
     if(!post) {
       throw new BadRequestException("Publication non trouvée");
     }
