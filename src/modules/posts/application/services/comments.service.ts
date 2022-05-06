@@ -5,6 +5,7 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { PostRepository } from '../post.repository';
 import { UsersService } from '../../../users/application/services/users.service';
 import { EditCommentDto } from '../dto/comment/edit-comment.dto';
+import { DeleteCommentDto } from '../dto/comment/delete-comment.dto';
 
 export class CommentsService {
   constructor(
@@ -20,10 +21,14 @@ export class CommentsService {
     if(!user) {
       throw new BadRequestException("Utilisateur inconnus")
     }
-    console.log("Parent: " + commentPostDto.parent);
+
     const post = await this.postsRepository.findOne({uuid: commentPostDto.parent});
     if(!post){
       throw new BadRequestException("Cette publication n'existe pas")
+    }
+
+    if(post.isComment()) {
+      throw new BadRequestException("Impossible de commenter un commentaire (pour l'instant)")
     }
 
     const comment = Post.createComment(
@@ -47,7 +52,7 @@ export class CommentsService {
     const comment = await this.postsRepository.findOne({uuid: editCommentDto.comment});
 
     if(!comment) {
-      throw new BadRequestException("Pas un commentaire");
+      throw new BadRequestException("Non trouvé");
     }
     const userIsAuthor: boolean = comment.getAuthor().getUuid() == user.getUuid();
 
@@ -66,5 +71,33 @@ export class CommentsService {
     comment.changeEditDate(editCommentDto.updatedAt);
 
     await this.postsRepository.persistAndFlush(comment);
+  }
+
+  async deleteComment(deleteCommentDto: DeleteCommentDto): Promise<void> {
+    const user = await this.usersService.findOneByUuid(deleteCommentDto.userId);
+    if(!user) {
+      throw new BadRequestException("Utilisateur inconnu");
+    }
+
+    const comment = await this.postsRepository.findOne({uuid: deleteCommentDto.commentId});
+
+    if(!comment) {
+      throw new BadRequestException("Non trouvé");
+    }
+
+    const userIsAuthor: boolean = comment.getAuthor().getUuid() == user.getUuid();
+
+    if(!userIsAuthor) {
+      throw new BadRequestException(
+        "Impossible de supprimer un commentaire qui n'est pas le sien"
+      );
+    }
+
+    if(!comment.isComment()) {
+      throw new BadRequestException("Pas un commentaire");
+    }
+
+    await this.postsRepository.removeAndFlush(comment);
+
   }
 }

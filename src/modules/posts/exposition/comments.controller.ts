@@ -1,6 +1,6 @@
 import {
   Body,
-  Controller, Param,
+  Controller, Delete, Param,
   Post, Put,
   Req,
   UseGuards,
@@ -14,6 +14,7 @@ import { CommentsService } from '../application/services/comments.service';
 import { CommentPostDto } from '../application/dto/comment/comment-post.dto';
 import { EditCommentRequestDto } from '../application/dto/comment/edit-comment-request.dto';
 import { EditCommentDto } from '../application/dto/comment/edit-comment.dto';
+import { DeleteCommentDto } from '../application/dto/comment/delete-comment.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -55,6 +56,19 @@ export class CommentsController {
     )
 
     return this.commentsService.editComment(editCommentDto);
+  }
+
+  @Delete(":postId/comment/:uuid")
+  async deleteComment(
+    @Param('uuid') comment: string,
+    @Req() req: Request
+  ): Promise<void> {
+    const deleteCommentDto = new DeleteCommentDto(
+      req.user["userId"],
+      comment
+    );
+
+    return this.commentsService.deleteComment(deleteCommentDto);
   }
 
 
