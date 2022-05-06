@@ -32,9 +32,10 @@ export class PostsController {
     @Body() createPostRequest: CreatePostRequestDto,
     @Req() req : Request
   ): Promise<string> {
+
     const createPostDto     =  new CreatePostDto();
     createPostDto.author    = req.user["userId"];
-    createPostDto.createdAt = createPostRequest.createdAt;
+    createPostDto.createdAt = new Date(createPostRequest.createdAt);
     createPostDto.content   = createPostRequest.content;
     createPostDto.title     = createPostRequest.title;
 

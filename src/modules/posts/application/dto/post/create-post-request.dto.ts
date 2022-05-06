@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
 
 export class CreatePostRequestDto {
@@ -9,7 +9,9 @@ export class CreatePostRequestDto {
   @Transform(({ value }: TransformFnParams) => value.trim())
   readonly content: string;
 
-  @IsDate()
   @IsNotEmpty()
-  readonly createdAt: Date;
+  @Transform(({ value }: TransformFnParams) => value.trim())
+  readonly createdAt: string;
+
+  readonly media: string;
 }
