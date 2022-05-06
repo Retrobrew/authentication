@@ -36,7 +36,7 @@ export class CommentsController {
       user["userId"],
       postId,
       commentPostRequest.content,
-      commentPostRequest.createdAt
+      new Date(commentPostRequest.createdAt)
     );
 
     return this.commentsService.commentPost(commentPostDto);
