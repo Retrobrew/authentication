@@ -1,6 +1,16 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { User } from '../../../users/domain/entities/user.entity';
 
+export interface IGroups {
+  uuid: string;
+  name: string;
+  picture: string;
+  createdAt: Date;
+  description: string;
+  isProject: boolean;
+  createdBy: User;
+}
+
 @Entity()
 export class Groups {
   @PrimaryKey()
@@ -24,21 +34,13 @@ export class Groups {
   @ManyToOne(() => User)
   createdBy: User;
 
-  constructor(
-    uuid: string,
-    name: string,
-    picture: string,
-    createdAt: Date,
-    description: string,
-    isProject: boolean,
-    createdBy: User,
-  ) {
-    this.uuid = uuid;
-    this.name = name;
-    this.picture = picture;
-    this.createdAt = createdAt;
-    this.description = description;
-    this.isProject = isProject;
-    this.createdBy = createdBy;
+  constructor(group: IGroups) {
+    this.uuid = group.uuid;
+    this.name = group.name;
+    this.picture = group.picture;
+    this.createdAt = group.createdAt;
+    this.description = group.description;
+    this.isProject = group.isProject;
+    this.createdBy = group.createdBy;
   }
 }
