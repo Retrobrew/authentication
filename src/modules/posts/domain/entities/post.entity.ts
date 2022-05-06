@@ -1,4 +1,4 @@
-import { Cascade, Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import { Cascade, Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property, TextType } from '@mikro-orm/core';
 import { User } from '../../../users/domain/entities/user.entity';
 import { randomUUID } from 'crypto';
 import { PostRepository } from '../../application/post.repository';
@@ -14,13 +14,13 @@ export class Post {
   @ManyToOne()
   private readonly author: User;
 
-  @Property()
+  @Property({type: TextType})
   private content: string;
 
   @Property({ nullable: true })
   private media?: string;
 
-  @OneToMany('Post', 'parent', {cascade: [Cascade.ALL]})
+  @OneToMany('Post', 'parent', { cascade: [Cascade.ALL] })
   private comments = new Collection<Post>(this);
 
   @ManyToOne(() => Post,{ nullable: true })
