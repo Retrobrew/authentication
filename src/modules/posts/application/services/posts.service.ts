@@ -25,7 +25,8 @@ export class PostsService {
       author,
       createPostDto.title,
       createPostDto.content,
-      createPostDto.createdAt
+      createPostDto.createdAt,
+      ""
     );
 
     await this.postsRepository.persistAndFlush(post);

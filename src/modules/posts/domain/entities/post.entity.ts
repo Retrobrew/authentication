@@ -48,6 +48,7 @@ export class Post {
     title: string,
     content: string,
     createdAt: Date,
+    media: string
   ): Post {
     const post =  new Post(
       author,
@@ -56,6 +57,9 @@ export class Post {
     );
     if(title) {
       post.title = title;
+    }
+    if(media){
+      post.media = media;
     }
 
     return post;

@@ -16,4 +16,7 @@ export class CreatePostDto {
   @IsNotEmpty()
   @IsDate()
   createdAt: Date;
+
+  @IsString()
+  media: string;
 }
