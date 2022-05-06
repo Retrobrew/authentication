@@ -6,6 +6,7 @@ import { PostsService } from './application/services/posts.service';
 import { UsersModule } from '../users/users.module';
 import { CommentsController } from './exposition/comments.controller';
 import { CommentsService } from './application/services/comments.service';
+import { FeedsController } from './exposition/feeds.controller';
 
 
 @Module({
@@ -15,7 +16,8 @@ import { CommentsService } from './application/services/comments.service';
   ],
   controllers: [
     PostsController,
-    CommentsController
+    CommentsController,
+    FeedsController
   ],
   providers: [
     PostsService,

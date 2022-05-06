@@ -95,14 +95,10 @@ export class PostsService {
     await this.postsRepository.removeAndFlush(post);
   }
 
-  async getUserFeed(userId: string): Promise<void> {
-    //TODO
-    const user: User = await this.userRepository.findOneByUuid("d7ddd4b6-84bb-4b6d-8cc1-179e1fea1699");
+  async getUserFeed(userId: string): Promise<Array<Object>> {
+    const user: User = await this.userRepository.findOneByUuid(userId);
 
-    this.postsRepository.getUserFeed(user).then((res) => {
-
-      console.log(res);
-    });
+    return await this.postsRepository.getUserFeed(user);
   }
 
 
