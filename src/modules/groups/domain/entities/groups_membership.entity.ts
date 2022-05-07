@@ -5,7 +5,7 @@ import { Groups } from './groups.entity';
 @Entity()
 export class GroupsMembership {
   @PrimaryKey({ autoincrement: true })
-  private id: number;
+  private id: string;
 
   @ManyToOne(() => User)
   private readonly user: User;
@@ -15,4 +15,11 @@ export class GroupsMembership {
 
   @Property()
   private readonly adhesion_date: Date;
+
+  constructor(id: string, user: User, group: Groups, adhesion_date: Date) {
+    this.id = id;
+    this.user = user;
+    this.group = group;
+    this.adhesion_date = adhesion_date;
+  }
 }
