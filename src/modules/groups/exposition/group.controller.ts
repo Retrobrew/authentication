@@ -18,6 +18,7 @@ import { GroupsService } from '../application/services/groups.service';
 import { ModifyGroupDto } from '../application/dto/modify-group.dto';
 import { Groups } from '../domain/entities/groups.entity';
 import { JoinGroupDto } from '../application/dto/join-group.dto';
+import { QuitGroupDto } from '../application/dto/quit-group.dto';
 
 @UsePipes(
   new ValidationPipe({
@@ -85,6 +86,16 @@ export class GroupController {
   async join(@Body() request: JoinGroupDto): Promise<void> {
     try {
       await this.groupsService.join(request);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @Post('/quit')
+  @HttpCode(202)
+  async quit(@Body() request: QuitGroupDto): Promise<void> {
+    try {
+      await this.groupsService.quit(request);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
