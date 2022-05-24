@@ -11,6 +11,7 @@ import { FriendRequest } from './domain/entities/friend-request.entity';
 import { AnswerFriendshipRequestService } from './application/services/Friendship/answer-friendship-request.service';
 import { AnswerFriendRequestController } from './exposition/friendship/answer-friend-request.controller';
 import { GetFriendRequestsController } from './exposition/friendship/get-friend-requests.controller';
+import { UsersProfileController } from './exposition/users-profile.controller';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { GetFriendRequestsController } from './exposition/friendship/get-friend-
   ],
   controllers: [
     UsersController,
+    UsersProfileController,
     FriendRequestController,
     AnswerFriendRequestController,
     GetFriendRequestsController
