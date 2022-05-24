@@ -5,7 +5,9 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
+import { GroupsModule } from './groups/groups.module';
 import { PostsModule } from './posts/posts.module';
+
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { PostsModule } from './posts/posts.module';
     }),
     AuthenticationModule,
     UsersModule,
+    GroupsModule,
     PostsModule,
   ],
   controllers: [AppController],
