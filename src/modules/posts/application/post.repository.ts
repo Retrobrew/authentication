@@ -11,10 +11,11 @@ export class PostRepository extends EntityRepository<Post> {
      * Paginer
      */
     const qb = this.qb('p').raw("SELECT\n" +
-      "    friend.username as 'friend',\n" +
-      "    friend.uuid as \"friend Id\",\n" +
+      "    friend.username as 'author',\n" +
+      "    friend.uuid as \"authorId\",\n" +
       "    p.title as 'title',\n" +
-      "    p.content as 'content'\n" +
+      "    p.content as 'content',\n" +
+      "    p.created_at as 'createdAt' \n" +
       "from post p\n" +
       "LEFT JOIN user friend\n" +
       "on p.author_uuid = friend.uuid\n" +
