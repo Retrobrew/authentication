@@ -14,6 +14,7 @@ import { GetFriendRequestsController } from './exposition/friendship/get-friend-
 import { UsersProfileController } from './exposition/users-profile.controller';
 import { FriendshipService } from './application/services/Friendship/friendship.service';
 import { Friendship } from './domain/entities/friendship.entity';
+import { UnfriendController } from './exposition/friendship/unfriend.controller';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { Friendship } from './domain/entities/friendship.entity';
   controllers: [
     UsersController,
     UsersProfileController,
+    UnfriendController,
     FriendRequestController,
     AnswerFriendRequestController,
     GetFriendRequestsController
