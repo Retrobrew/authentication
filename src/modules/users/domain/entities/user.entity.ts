@@ -83,6 +83,14 @@ export class User {
     this.username = lastname;
   }
 
+  getCountry(): string {
+    return this.country;
+  }
+
+  getPicture(): string {
+    return this.picture;
+  }
+
   getPassword(): string {
     return this.credentials.getPassword();
   }
