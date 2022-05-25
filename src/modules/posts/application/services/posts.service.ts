@@ -7,6 +7,8 @@ import { UsersService } from '../../../users/application/services/users.service'
 import { PostRepository } from '../post.repository';
 import { User } from '../../../users/domain/entities/user.entity';
 import { DeletePostDto } from '../dto/post/delete-post.dto';
+import { FeedPostDto } from '../dto/post/feed-post.dto';
+import { AuthorDto } from '../dto/post/author.dto';
 
 export class PostsService {
   constructor(
@@ -99,6 +101,30 @@ export class PostsService {
     const user: User = await this.userRepository.findOneByUuid(userId);
 
     return await this.postsRepository.getUserFeed(user);
+  }
+
+  async getHomeFeed(): Promise<Array<FeedPostDto>> {
+    const posts  = await this.postsRepository.getHomeFeed();
+    const feedPosts: Array<FeedPostDto> = [];
+
+    posts.forEach((post: any) => {
+      const authorDto = new AuthorDto(
+        post.author.uuid,
+        post.author.username
+      );
+      const feedPost = new FeedPostDto(
+        post.uuid,
+        post.title,
+        post.comments.length,
+        authorDto,
+        post.content,
+        post.createdAt
+      );
+      feedPosts.push(feedPost);
+
+    })
+
+    return feedPosts;
   }
 
 
