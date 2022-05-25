@@ -26,6 +26,9 @@ export class User {
   @Property()
   private username: string;
 
+  @Property({nullable: true})
+  private picture: string;
+
   @Embedded(
     () => Credentials,
     {
@@ -70,6 +73,10 @@ export class User {
 
   changeEmail(email: string): void {
     this.email = email;
+  }
+
+  getUsername(): string {
+    return this.username;
   }
 
   changeUsername(lastname: string): void {

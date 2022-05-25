@@ -12,10 +12,12 @@ import { AnswerFriendshipRequestService } from './application/services/Friendshi
 import { AnswerFriendRequestController } from './exposition/friendship/answer-friend-request.controller';
 import { GetFriendRequestsController } from './exposition/friendship/get-friend-requests.controller';
 import { UsersProfileController } from './exposition/users-profile.controller';
+import { FriendshipService } from './application/services/Friendship/friendship.service';
+import { Friendship } from './domain/entities/friendship.entity';
 
 @Module({
   imports: [
-    MikroOrmModule.forFeature({ entities: [User, FriendRequest] }),
+    MikroOrmModule.forFeature({ entities: [User, FriendRequest, Friendship] }),
     forwardRef(() => AuthenticationModule)
   ],
   controllers: [
@@ -29,7 +31,8 @@ import { UsersProfileController } from './exposition/users-profile.controller';
     UsersService,
     UserRepository,
     RequestFriendshipService,
-    AnswerFriendshipRequestService
+    AnswerFriendshipRequestService,
+    FriendshipService
   ],
   exports: [ UsersService ] // Requis pour l'utiliser dans auth module
 })
