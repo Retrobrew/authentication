@@ -17,6 +17,7 @@ import { Post as UserPost } from '../domain/entities/post.entity';
 import { CreatePostDto } from '../application/dto/post/create-post.dto';
 import { EditPostRequestDto } from '../application/dto/post/edit-post-request.dto';
 import { DeletePostDto } from '../application/dto/post/delete-post.dto';
+import { UuidDto } from '../application/dto/uuid.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -31,7 +32,7 @@ export class PostsController {
   async createPost(
     @Body() createPostRequest: CreatePostRequestDto,
     @Req() req : Request
-  ): Promise<string> {
+  ): Promise<UuidDto> {
 
     const createPostDto     =  new CreatePostDto();
     createPostDto.author    = req.user["userId"];
@@ -39,7 +40,7 @@ export class PostsController {
     createPostDto.content   = createPostRequest.content;
     createPostDto.title     = createPostRequest.title;
 
-    return this.postsService.createPost(createPostDto);
+    return new UuidDto(await this.postsService.createPost(createPostDto));
   }
 
   @Put(":uuid")
