@@ -29,7 +29,7 @@ export class PostsService {
       createPostDto.title,
       createPostDto.content,
       createPostDto.createdAt,
-      ""
+      createPostDto.media
     );
 
     await this.postsRepository.persistAndFlush(post);

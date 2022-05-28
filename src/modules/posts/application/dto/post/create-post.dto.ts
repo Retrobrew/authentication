@@ -17,6 +17,5 @@ export class CreatePostDto {
   @IsDate()
   createdAt: Date;
 
-  @IsString()
-  media: string;
+  media: Buffer;
 }

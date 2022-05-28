@@ -1,4 +1,14 @@
-import { Cascade, Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property, TextType } from '@mikro-orm/core';
+import {
+  BlobType,
+  Cascade,
+  Collection,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryKey,
+  Property,
+  TextType,
+} from '@mikro-orm/core';
 import { User } from '../../../users/domain/entities/user.entity';
 import { randomUUID } from 'crypto';
 import { PostRepository } from '../../application/post.repository';
@@ -17,8 +27,8 @@ export class Post {
   @Property({type: TextType})
   private content: string;
 
-  @Property({ nullable: true })
-  private media?: string;
+  @Property({ type: BlobType, nullable: true })
+  private media?: Buffer;
 
   @OneToMany('Post', 'parent', { cascade: [Cascade.ALL] })
   private comments = new Collection<Post>(this);
@@ -48,7 +58,7 @@ export class Post {
     title: string,
     content: string,
     createdAt: Date,
-    media: string
+    media: Buffer
   ): Post {
     const post =  new Post(
       author,

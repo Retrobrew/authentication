@@ -3,8 +3,8 @@ import {
   Controller, Delete, Get, Param,
   Post,
   Put,
-  Req,
-  UseGuards,
+  Req, UploadedFile,
+  UseGuards, UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -18,6 +18,8 @@ import { CreatePostDto } from '../application/dto/post/create-post.dto';
 import { EditPostRequestDto } from '../application/dto/post/edit-post-request.dto';
 import { DeletePostDto } from '../application/dto/post/delete-post.dto';
 import { UuidDto } from '../application/dto/uuid.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -29,8 +31,10 @@ export class PostsController {
   }
 
   @Post()
+  @UseInterceptors(FileInterceptor('media'))
   async createPost(
     @Body() createPostRequest: CreatePostRequestDto,
+    @UploadedFile() media: Express.Multer.File,
     @Req() req : Request
   ): Promise<UuidDto> {
 
@@ -39,6 +43,7 @@ export class PostsController {
     createPostDto.createdAt = new Date(createPostRequest.createdAt);
     createPostDto.content   = createPostRequest.content;
     createPostDto.title     = createPostRequest.title;
+    createPostDto.media     = media.buffer;
 
     return new UuidDto(await this.postsService.createPost(createPostDto));
   }

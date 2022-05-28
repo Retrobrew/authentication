@@ -13,5 +13,5 @@ export class CreatePostRequestDto {
   @Transform(({ value }: TransformFnParams) => value.trim())
   readonly createdAt: string;
 
-  readonly media: string;
+  readonly media: Buffer;
 }
