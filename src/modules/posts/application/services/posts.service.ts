@@ -106,7 +106,7 @@ export class PostsService {
         {author: user, parent: null},
         {fields: [
             // @ts-ignore
-            'uuid', 'title', 'comments','author', 'createdAt', 'content', { author: ['uuid', 'username']}, { comments: ['uuid']}
+            'uuid', 'title', 'comments','author', 'createdAt', 'content', 'media', { author: ['uuid', 'username']}, { comments: ['uuid']}
             // @ts-ignore
           ], orderBy: { createdAt: QueryOrder.DESC }
         }
@@ -124,6 +124,7 @@ export class PostsService {
         0,
         authorDto,
         post.content,
+        null,
         post.createdAt
       );
       postsFeed.push(feedPost);
@@ -140,6 +141,7 @@ export class PostsService {
         post.comments.length,
         authorDto,
         post.content,
+        post.media,
         post.createdAt
       );
       postsFeed.push(feedPost);
@@ -166,6 +168,7 @@ export class PostsService {
         post.comments.length,
         authorDto,
         post.content,
+        null,
         post.createdAt
       );
       feedPosts.push(feedPost);

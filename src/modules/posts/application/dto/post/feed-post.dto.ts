@@ -6,6 +6,7 @@ export class FeedPostDto {
   public readonly commentsNb: number;
   public readonly author: AuthorDto;
   public readonly content: string;
+  public readonly media: Buffer;
   public readonly createdAt: Date;
 
   constructor(
@@ -14,6 +15,7 @@ export class FeedPostDto {
     commentsNb: number,
     author: AuthorDto,
     content: string,
+    media: Buffer,
     createdAt: Date
   ) {
     this.uuid = uuid;
@@ -21,6 +23,7 @@ export class FeedPostDto {
     this.commentsNb = commentsNb;
     this.author = author;
     this.content = content;
+    this.media = media;
     this.createdAt = createdAt;
   }
 }
