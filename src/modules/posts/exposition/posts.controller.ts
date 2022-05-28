@@ -43,7 +43,7 @@ export class PostsController {
     createPostDto.createdAt = new Date(createPostRequest.createdAt);
     createPostDto.content   = createPostRequest.content;
     createPostDto.title     = createPostRequest.title;
-    createPostDto.media     = media.buffer;
+    createPostDto.media     = media ? media.buffer : null;
 
     return new UuidDto(await this.postsService.createPost(createPostDto));
   }
