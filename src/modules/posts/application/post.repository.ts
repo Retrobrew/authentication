@@ -7,8 +7,6 @@ export class PostRepository extends EntityRepository<Post> {
   async getUserFeed(user: User): Promise<Array<Object>> {
 
     /**
-     * TODO limiter le nombre de résultat
-     * avoir des liens pour les commentaires des posts
      * Paginer
      */
     const qb = this.qb('p').raw("SELECT\n" +
@@ -16,7 +14,8 @@ export class PostRepository extends EntityRepository<Post> {
       "    friend.uuid as \"authorId\",\n" +
       "    p.title as 'title',\n" +
       "    p.content as 'content',\n" +
-      "    p.created_at as 'createdAt' \n" +
+      "    p.created_at as 'createdAt', \n" +
+      "    p.uuid " +
       "from post p\n" +
       "LEFT JOIN user friend\n" +
       "on p.author_uuid = friend.uuid\n" +

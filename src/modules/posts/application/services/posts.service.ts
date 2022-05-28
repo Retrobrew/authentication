@@ -9,6 +9,7 @@ import { User } from '../../../users/domain/entities/user.entity';
 import { DeletePostDto } from '../dto/post/delete-post.dto';
 import { FeedPostDto } from '../dto/post/feed-post.dto';
 import { AuthorDto } from '../dto/post/author.dto';
+import { QueryOrder } from '@mikro-orm/core';
 
 export class PostsService {
   constructor(
@@ -97,10 +98,57 @@ export class PostsService {
     await this.postsRepository.removeAndFlush(post);
   }
 
-  async getUserFeed(userId: string): Promise<Array<Object>> {
+  async getUserFeed(userId: string): Promise<Array<FeedPostDto>> {
     const user: User = await this.userRepository.findOneByUuid(userId);
+    const friendsPosts = await this.postsRepository.getUserFeed(user);
+    const userPosts: Array<Post> = await this.postsRepository
+      .find(
+        {author: user, parent: null},
+        {fields: [
+            // @ts-ignore
+            'uuid', 'title', 'comments','author', 'createdAt', 'content', { author: ['uuid', 'username']}, { comments: ['uuid']}
+            // @ts-ignore
+          ], orderBy: { createdAt: QueryOrder.DESC }
+        }
+      );
+    const postsFeed: Array<FeedPostDto> = [];
 
-    return await this.postsRepository.getUserFeed(user);
+    friendsPosts.forEach((post: any) => {
+      const authorDto = new AuthorDto(
+        post.authorId,
+        post.author
+      );
+      const feedPost = new FeedPostDto(
+        post.uuid,
+        post.title,
+        0,
+        authorDto,
+        post.content,
+        post.createdAt
+      );
+      postsFeed.push(feedPost);
+    })
+
+    userPosts.forEach((post: any) => {
+      const authorDto = new AuthorDto(
+        post.author.getUuid(),
+        post.author.username
+      );
+      const feedPost = new FeedPostDto(
+        post.uuid,
+        post.title,
+        post.comments.length,
+        authorDto,
+        post.content,
+        post.createdAt
+      );
+      postsFeed.push(feedPost);
+    })
+
+    // @ts-ignore
+    postsFeed.sort( (post, otherPost) => post.createdAt - otherPost.createdAt)
+
+    return postsFeed.reverse();
   }
 
   async getHomeFeed(): Promise<Array<FeedPostDto>> {

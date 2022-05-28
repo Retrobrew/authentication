@@ -17,7 +17,7 @@ export class FeedsController {
   @Get("my")
   async getFeed(
     @Req() req: Request
-  ): Promise<Array<Object>> {
+  ): Promise<Array<FeedPostDto>> {
     return await this.postsService.getUserFeed(req.user["userId"]);
   }
 
