@@ -1,20 +1,21 @@
 import { EntityRepository } from '@mikro-orm/mysql';
 import { Post } from '../domain/entities/post.entity';
 import { User } from '../../users/domain/entities/user.entity';
+import { QueryOrder } from '@mikro-orm/core';
 
 export class PostRepository extends EntityRepository<Post> {
   async getUserFeed(user: User): Promise<Array<Object>> {
 
     /**
-     * TODO limiter le nombre de résultat
-     * avoir des liens pour les commentaires des posts
      * Paginer
      */
     const qb = this.qb('p').raw("SELECT\n" +
-      "    friend.username as 'friend',\n" +
-      "    friend.uuid as \"friend Id\",\n" +
+      "    friend.username as 'author',\n" +
+      "    friend.uuid as \"authorId\",\n" +
       "    p.title as 'title',\n" +
-      "    p.content as 'content'\n" +
+      "    p.content as 'content',\n" +
+      "    p.created_at as 'createdAt', \n" +
+      "    p.uuid " +
       "from post p\n" +
       "LEFT JOIN user friend\n" +
       "on p.author_uuid = friend.uuid\n" +
@@ -27,5 +28,19 @@ export class PostRepository extends EntityRepository<Post> {
       "    );", {uuid: user.getUuid()})
 
     return await this.em.getConnection().execute(qb);
+  }
+
+  async getHomeFeed(): Promise<Array<Object>> {
+    //TODO scroll infini
+    return this.find(
+      {parent: null},
+      {
+        limit: 10,
+        fields: [
+          // @ts-ignore
+          'uuid', 'title', 'comments','author', 'createdAt', 'content', { author: ['uuid', 'username']}, { comments: ['uuid']}
+          // @ts-ignore
+        ], orderBy: { createdAt: QueryOrder.DESC }
+      })
   }
 }

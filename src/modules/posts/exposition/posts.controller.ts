@@ -3,8 +3,8 @@ import {
   Controller, Delete, Get, Param,
   Post,
   Put,
-  Req,
-  UseGuards,
+  Req, UploadedFile,
+  UseGuards, UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -17,6 +17,9 @@ import { Post as UserPost } from '../domain/entities/post.entity';
 import { CreatePostDto } from '../application/dto/post/create-post.dto';
 import { EditPostRequestDto } from '../application/dto/post/edit-post-request.dto';
 import { DeletePostDto } from '../application/dto/post/delete-post.dto';
+import { UuidDto } from '../application/dto/uuid.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -28,18 +31,21 @@ export class PostsController {
   }
 
   @Post()
+  @UseInterceptors(FileInterceptor('media'))
   async createPost(
     @Body() createPostRequest: CreatePostRequestDto,
+    @UploadedFile() media: Express.Multer.File,
     @Req() req : Request
-  ): Promise<string> {
+  ): Promise<UuidDto> {
 
     const createPostDto     =  new CreatePostDto();
     createPostDto.author    = req.user["userId"];
     createPostDto.createdAt = new Date(createPostRequest.createdAt);
     createPostDto.content   = createPostRequest.content;
     createPostDto.title     = createPostRequest.title;
+    createPostDto.media     = media.buffer;
 
-    return this.postsService.createPost(createPostDto);
+    return new UuidDto(await this.postsService.createPost(createPostDto));
   }
 
   @Put(":uuid")
