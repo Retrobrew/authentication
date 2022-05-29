@@ -10,14 +10,11 @@ export class CreateGroupDto {
   @Transform(({ value }: TransformFnParams) => value.trim())
   picture: string;
 
-  @Transform(({ value }: TransformFnParams) => value.trim())
   description: string;
 
   @IsNotEmpty()
   isProject: boolean;
 
-  @IsNotEmpty()
-  @Transform(({ value }: TransformFnParams) => value.trim())
   userUuid: string;
 
   constructor(
