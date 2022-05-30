@@ -4,11 +4,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import {
   Groups,
-  IGroups,
 } from 'src/modules/groups/domain/entities/groups.entity';
 import { UsersService } from 'src/modules/users/application/services/users.service';
 import { CreateGroupDto } from '../dto/create-group.dto';
 import { ModifyGroupDto } from '../dto/modify-group.dto';
+import { User } from '../../../users/domain/entities/user.entity';
 
 @Injectable()
 export class GroupsService {
@@ -42,8 +42,6 @@ export class GroupsService {
       throw new NotFoundException('Group not found');
     }
 
-    console.log(group);
-
     await this.groupsRepository.nativeUpdate({ uuid: request.uuid }, request);
     await this.groupsRepository.flush();
   }
@@ -60,5 +58,11 @@ export class GroupsService {
 
   async find(uuid: string): Promise<Groups> {
     return await this.groupsRepository.findOne(uuid);
+  }
+
+  async getUserGroups(userUuid: string): Promise<Array<Groups>> {
+    const user: User = await this.userService.findOneByUuid(userUuid)
+
+    return await this.groupsRepository.find({createdBy: user})
   }
 }

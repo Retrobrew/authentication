@@ -18,4 +18,6 @@ export class CreatePostDto {
   createdAt: Date;
 
   media: Buffer;
+
+  postedIn: string;
 }

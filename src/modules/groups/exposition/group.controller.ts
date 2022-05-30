@@ -7,7 +7,7 @@ import {
   HttpCode,
   Param,
   Post,
-  Put,
+  Put, Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -17,6 +17,7 @@ import { CreateGroupDto } from '../application/dto/create-group.dto';
 import { GroupsService } from '../application/services/groups.service';
 import { ModifyGroupDto } from '../application/dto/modify-group.dto';
 import { Groups } from '../domain/entities/groups.entity';
+import { Request } from 'express';
 
 @UsePipes(
   new ValidationPipe({
@@ -48,10 +49,14 @@ export class GroupController {
 
   @Post()
   @HttpCode(202)
-  async create(@Body() createGroupDto: CreateGroupDto) {
+  async create(
+    @Body() createGroupDto: CreateGroupDto,
+    @Req() req: Request
+  ) {
+    createGroupDto.userUuid= req.user['userId'];
+
     try {
-      const group = await this.groupsService.create(createGroupDto);
-      return group;
+      return await this.groupsService.create(createGroupDto);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

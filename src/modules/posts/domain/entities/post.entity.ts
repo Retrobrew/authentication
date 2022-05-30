@@ -12,6 +12,7 @@ import {
 import { User } from '../../../users/domain/entities/user.entity';
 import { randomUUID } from 'crypto';
 import { PostRepository } from '../../application/post.repository';
+import { Groups } from '../../../groups/domain/entities/groups.entity';
 
 @Entity({ customRepository: () => PostRepository })
 export class Post {
@@ -39,6 +40,9 @@ export class Post {
   @Property()
   private createdAt: Date;
 
+  @ManyToOne(() => Groups,{ nullable: true })
+  private postedIn: Groups;
+
   @Property({ nullable: true })
   private lastUpdatedAt?: Date;
 
@@ -58,7 +62,8 @@ export class Post {
     title: string,
     content: string,
     createdAt: Date,
-    media: Buffer
+    media: Buffer,
+    postedIn: Groups
   ): Post {
     const post =  new Post(
       author,
@@ -70,6 +75,10 @@ export class Post {
     }
     if(media){
       post.media = media;
+    }
+
+    if(postedIn){
+      post.postedIn = postedIn
     }
 
     return post;

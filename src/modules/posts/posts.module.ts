@@ -7,11 +7,15 @@ import { UsersModule } from '../users/users.module';
 import { CommentsController } from './exposition/comments.controller';
 import { CommentsService } from './application/services/comments.service';
 import { FeedsController } from './exposition/feeds.controller';
+import { GroupsService } from '../groups/application/services/groups.service';
+import { UsersService } from '../users/application/services/users.service';
+import { Groups } from '../groups/domain/entities/groups.entity';
+import { User } from '../users/domain/entities/user.entity';
 
 
 @Module({
   imports: [
-    MikroOrmModule.forFeature({ entities: [Post] }),
+    MikroOrmModule.forFeature({ entities: [Post, Groups, User] }),
     UsersModule
   ],
   controllers: [
@@ -21,7 +25,9 @@ import { FeedsController } from './exposition/feeds.controller';
   ],
   providers: [
     PostsService,
-    CommentsService
+    CommentsService,
+    GroupsService,
+    UsersService
   ]
 })
 export class PostsModule{}
