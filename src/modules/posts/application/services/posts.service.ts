@@ -10,6 +10,7 @@ import { DeletePostDto } from '../dto/post/delete-post.dto';
 import { FeedPostDto } from '../dto/post/feed-post.dto';
 import { AuthorDto } from '../dto/post/author.dto';
 import { QueryOrder } from '@mikro-orm/core';
+import { Groups } from '../../../groups/domain/entities/groups.entity';
 
 export class PostsService {
   constructor(
@@ -155,6 +156,31 @@ export class PostsService {
 
   async getHomeFeed(): Promise<Array<FeedPostDto>> {
     const posts  = await this.postsRepository.getHomeFeed();
+    const feedPosts: Array<FeedPostDto> = [];
+
+    posts.forEach((post: any) => {
+      const authorDto = new AuthorDto(
+        post.author.uuid,
+        post.author.username
+      );
+      const feedPost = new FeedPostDto(
+        post.uuid,
+        post.title,
+        post.comments.length,
+        authorDto,
+        post.content,
+        null,
+        post.createdAt
+      );
+      feedPosts.push(feedPost);
+
+    })
+
+    return feedPosts;
+  }
+
+  async getGroupFeed(group: Groups){
+    const posts = await this.postsRepository.getGroupFeed(group);
     const feedPosts: Array<FeedPostDto> = [];
 
     posts.forEach((post: any) => {

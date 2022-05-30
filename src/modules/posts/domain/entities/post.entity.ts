@@ -12,6 +12,7 @@ import {
 import { User } from '../../../users/domain/entities/user.entity';
 import { randomUUID } from 'crypto';
 import { PostRepository } from '../../application/post.repository';
+import { Groups } from '../../../groups/domain/entities/groups.entity';
 
 @Entity({ customRepository: () => PostRepository })
 export class Post {
@@ -38,6 +39,9 @@ export class Post {
 
   @Property()
   private createdAt: Date;
+
+  @ManyToOne(() => Groups,{ nullable: false, default: "home" })
+  private postedIn: Groups;
 
   @Property({ nullable: true })
   private lastUpdatedAt?: Date;
