@@ -14,4 +14,6 @@ export class CreatePostRequestDto {
   readonly createdAt: string;
 
   readonly media: Buffer;
+
+  readonly postedIn: string;
 }

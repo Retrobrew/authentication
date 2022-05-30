@@ -44,6 +44,7 @@ export class PostsController {
     createPostDto.content   = createPostRequest.content;
     createPostDto.title     = createPostRequest.title;
     createPostDto.media     = media ? media.buffer : null;
+    createPostDto.postedIn  = createPostRequest.postedIn;
 
     return new UuidDto(await this.postsService.createPost(createPostDto));
   }

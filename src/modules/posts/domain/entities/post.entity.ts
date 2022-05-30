@@ -40,7 +40,7 @@ export class Post {
   @Property()
   private createdAt: Date;
 
-  @ManyToOne(() => Groups,{ nullable: false, default: "home" })
+  @ManyToOne(() => Groups,{ nullable: true })
   private postedIn: Groups;
 
   @Property({ nullable: true })
@@ -62,7 +62,8 @@ export class Post {
     title: string,
     content: string,
     createdAt: Date,
-    media: Buffer
+    media: Buffer,
+    postedIn: Groups
   ): Post {
     const post =  new Post(
       author,
@@ -74,6 +75,10 @@ export class Post {
     }
     if(media){
       post.media = media;
+    }
+
+    if(postedIn){
+      post.postedIn = postedIn
     }
 
     return post;

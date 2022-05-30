@@ -11,12 +11,14 @@ import { FeedPostDto } from '../dto/post/feed-post.dto';
 import { AuthorDto } from '../dto/post/author.dto';
 import { QueryOrder } from '@mikro-orm/core';
 import { Groups } from '../../../groups/domain/entities/groups.entity';
+import { GroupsService } from '../../../groups/application/services/groups.service';
 
 export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postsRepository: PostRepository,
-    private readonly userRepository: UsersService
+    private readonly userRepository: UsersService,
+    private readonly groupService: GroupsService
   ) {}
 
   async createPost(createPostDto: CreatePostDto): Promise<string> {
@@ -24,13 +26,19 @@ export class PostsService {
     if(!author){
       throw new BadRequestException("Utilisateur inconnu");
     }
+    let group = null;
+
+    if(createPostDto.postedIn){
+       group = await this.groupService.find(createPostDto.postedIn);
+    }
 
     const post = Post.createPost(
       author,
       createPostDto.title,
       createPostDto.content,
       createPostDto.createdAt,
-      createPostDto.media
+      createPostDto.media,
+      group
     );
 
     await this.postsRepository.persistAndFlush(post);
