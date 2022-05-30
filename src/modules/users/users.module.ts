@@ -15,10 +15,12 @@ import { UsersProfileController } from './exposition/users-profile.controller';
 import { FriendshipService } from './application/services/Friendship/friendship.service';
 import { Friendship } from './domain/entities/friendship.entity';
 import { UnfriendController } from './exposition/friendship/unfriend.controller';
+import { GroupsService } from '../groups/application/services/groups.service';
+import { Groups } from '../groups/domain/entities/groups.entity';
 
 @Module({
   imports: [
-    MikroOrmModule.forFeature({ entities: [User, FriendRequest, Friendship] }),
+    MikroOrmModule.forFeature({ entities: [User, FriendRequest, Friendship, Groups] }),
     forwardRef(() => AuthenticationModule)
   ],
   controllers: [
@@ -34,7 +36,8 @@ import { UnfriendController } from './exposition/friendship/unfriend.controller'
     UserRepository,
     RequestFriendshipService,
     AnswerFriendshipRequestService,
-    FriendshipService
+    FriendshipService,
+    GroupsService
   ],
   exports: [ UsersService ] // Requis pour l'utiliser dans auth module
 })
