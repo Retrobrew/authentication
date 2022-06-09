@@ -1,15 +1,14 @@
 import { Logger } from '@nestjs/common';
 import { Options } from '@mikro-orm/core';
-import { User } from './src/users/entities/user.entity';
-import { Credentials } from './src/users/entities/credentials.entity';
 
 const logger = new Logger('MikroORM');
 const config: Options = {
-  entities: [User, Credentials],
-  entitiesTs: [User, Credentials],
+  entities: ["./dist/src/modules/*/domain/entities/*"],
+  entitiesTs: ["./src/modules/*/domain/entities/*"],
   dbName: process.env.DATABASE_NAME,
   type: 'mysql',
-  port: 3306,
+  host: process.env.DATABASE_HOST,
+  port: parseInt(process.env.DATABASE_PORT),
   debug: true,
   user: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
