@@ -32,7 +32,7 @@ export class Groups {
   isProject: boolean;
 
   @ManyToOne(() => User)
-  createdBy: User;
+  private readonly createdBy: User;
 
   constructor(group: IGroups) {
     this.uuid = group.uuid;
@@ -42,5 +42,9 @@ export class Groups {
     this.description = group.description;
     this.isProject = group.isProject;
     this.createdBy = group.createdBy;
+  }
+
+  public getCreator(): User {
+    return this.createdBy;
   }
 }
