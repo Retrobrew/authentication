@@ -1,15 +1,16 @@
 import { EntityRepository } from '@mikro-orm/mysql';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Groups } from 'src/modules/groups/domain/entities/groups.entity';
 import { UsersService } from 'src/modules/users/application/services/users.service';
 import { CreateGroupDto } from '../dto/create-group.dto';
 import { ModifyGroupDto } from '../dto/modify-group.dto';
+import { User } from '../../../users/domain/entities/user.entity';
+import { DeleteGroupDto } from '../dto/delete-group.dto';
 import { GroupsMembership } from '../../domain/entities/groups_membership.entity';
 import { JoinGroupDto, RequestGroup } from '../dto/join-group.dto';
 import { QuitGroupDto } from '../dto/quit-group.dto';
-import { User } from '../../../users/domain/entities/user.entity';
 
 export interface UserAndGroup {
   user: User;
@@ -50,15 +51,22 @@ export class GroupsService {
       throw new NotFoundException('Group not found');
     }
 
-    console.log(group);
-
     await this.groupsRepository.nativeUpdate({ uuid: request.uuid }, request);
     await this.groupsRepository.flush();
   }
 
-  async remove(groupUuid: string): Promise<void> {
-    // TODO : autorisation
-    const group = await this.groupsRepository.findOne(groupUuid);
+  async remove(deleteGroupDto: DeleteGroupDto): Promise<void> {
+    const user: User = await this.userService.findOneByUuid(deleteGroupDto.userUuid);
+
+    if(!user){
+      throw new BadRequestException("User unknown");
+    }
+    const group = await this.groupsRepository.findOne(deleteGroupDto.groupUuid);
+
+    if(group.getCreator() !== user) {
+      throw new ForbiddenException("Operation denied");
+    }
+
     await this.groupsRepository.removeAndFlush(group);
   }
 
@@ -68,6 +76,17 @@ export class GroupsService {
 
   async find(uuid: string): Promise<Groups> {
     return await this.groupsRepository.findOne(uuid);
+  }
+
+  async getUserGroups(userUuid: string): Promise<Array<Groups>> {
+    const user: User = await this.userService.findOneByUuid(userUuid);
+
+    if(!user){
+      throw new BadRequestException("User unknown");
+    }
+
+    // @ts-ignore
+    return this.groupsRepository.find({ createdBy: user });
   }
 
   async join(request: JoinGroupDto): Promise<void> {

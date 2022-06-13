@@ -7,7 +7,7 @@ import {
   HttpCode,
   Param,
   Post,
-  Put,
+  Put, Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -17,6 +17,8 @@ import { CreateGroupDto } from '../application/dto/create-group.dto';
 import { GroupsService } from '../application/services/groups.service';
 import { ModifyGroupDto } from '../application/dto/modify-group.dto';
 import { Groups } from '../domain/entities/groups.entity';
+import { Request } from 'express';
+import { DeleteGroupDto } from '../application/dto/delete-group.dto';
 import { JoinGroupDto } from '../application/dto/join-group.dto';
 import { QuitGroupDto } from '../application/dto/quit-group.dto';
 
@@ -50,10 +52,14 @@ export class GroupController {
 
   @Post()
   @HttpCode(202)
-  async create(@Body() createGroupDto: CreateGroupDto) {
+  async create(
+    @Body() createGroupDto: CreateGroupDto,
+    @Req() req: Request
+  ) {
+    createGroupDto.userUuid= req.user['userId'];
+
     try {
-      const group = await this.groupsService.create(createGroupDto);
-      return group;
+      return await this.groupsService.create(createGroupDto);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -69,11 +75,17 @@ export class GroupController {
     }
   }
 
-  @Delete()
+  @Delete(':uuid')
   @HttpCode(202)
-  async remove(@Body() uuid: string) {
+  async remove(
+    @Req() request: Request,
+    @Param() uuid: string
+  ) {
+    const userUuid = request.user['userId'];
+    const deleteGroupDto = new DeleteGroupDto(userUuid, uuid);
+
     try {
-      await this.groupsService.remove(uuid);
+      await this.groupsService.remove(deleteGroupDto);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
