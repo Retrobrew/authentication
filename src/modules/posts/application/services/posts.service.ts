@@ -12,6 +12,7 @@ import { AuthorDto } from '../dto/post/author.dto';
 import { QueryOrder } from '@mikro-orm/core';
 import { Groups } from '../../../groups/domain/entities/groups.entity';
 import { GroupsService } from '../../../groups/application/services/groups.service';
+import { PostedInDto } from '../dto/post/posted-in.dto';
 
 export class PostsService {
   constructor(
@@ -115,7 +116,7 @@ export class PostsService {
         {author: user, parent: null},
         {fields: [
             // @ts-ignore
-            'uuid', 'title', 'comments','author', 'createdAt', 'content', 'media', { author: ['uuid', 'username']}, { comments: ['uuid']}
+            'uuid', 'title', 'comments','author', 'createdAt', 'content', 'media', 'postedIn', { author: ['uuid', 'username']}, { comments: ['uuid']}
             // @ts-ignore
           ], orderBy: { createdAt: QueryOrder.DESC }
         }
@@ -134,7 +135,8 @@ export class PostsService {
         authorDto,
         post.content,
         null,
-        post.createdAt
+        post.createdAt,
+        post.postedIn?.uuid
       );
       postsFeed.push(feedPost);
     })
@@ -151,7 +153,8 @@ export class PostsService {
         authorDto,
         post.content,
         post.media,
-        post.createdAt
+        post.createdAt,
+        post.postedIn?.uuid
       );
       postsFeed.push(feedPost);
     })
@@ -171,6 +174,16 @@ export class PostsService {
         post.author.uuid,
         post.author.username
       );
+
+      let postedInDto = null;
+
+      if(post.postedIn){
+        postedInDto = new PostedInDto(
+          post.postedIn.uuid,
+          post.postedIn.name
+        )
+      }
+
       const feedPost = new FeedPostDto(
         post.uuid,
         post.title,
@@ -178,7 +191,9 @@ export class PostsService {
         authorDto,
         post.content,
         null,
-        post.createdAt
+        post.createdAt,
+        post.postedIn?.uuid,
+        postedInDto
       );
       feedPosts.push(feedPost);
 
@@ -196,6 +211,7 @@ export class PostsService {
         post.author.uuid,
         post.author.username
       );
+
       const feedPost = new FeedPostDto(
         post.uuid,
         post.title,
@@ -203,7 +219,8 @@ export class PostsService {
         authorDto,
         post.content,
         null,
-        post.createdAt
+        post.createdAt,
+        post.postedIn?.uuid
       );
       feedPosts.push(feedPost);
 
