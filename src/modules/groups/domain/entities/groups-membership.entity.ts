@@ -14,12 +14,11 @@ export class GroupsMembership {
   private readonly group: Groups;
 
   @Property()
-  private readonly adhesion_date: Date;
+  private readonly adhesionDate: Date;
 
-  constructor(id: string, user: User, group: Groups, adhesion_date: Date) {
-    this.id = id;
+  constructor(user: User, group: Groups, adhesionDate: Date) {
     this.user = user;
     this.group = group;
-    this.adhesion_date = adhesion_date;
+    this.adhesionDate = adhesionDate;
   }
 }

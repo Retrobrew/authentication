@@ -91,13 +91,17 @@ export class GroupController {
     }
   }
 
-  // Join/quit group
-
-  @Post('/join')
+  @Post(':groupUuid/join')
   @HttpCode(202)
-  async join(@Body() request: JoinGroupDto): Promise<void> {
+  async join(
+    @Req() request: Request,
+    @Param('groupUuid') groupUuid: string
+  ): Promise<void> {
+    const user = request.user['userId'];
+    const joinGroupDto = new JoinGroupDto(user, groupUuid);
+
     try {
-      await this.groupsService.join(request);
+      await this.groupsService.join(joinGroupDto);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

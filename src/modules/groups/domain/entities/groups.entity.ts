@@ -19,7 +19,7 @@ export class Groups {
   @Property()
   name: string;
 
-  @Property()
+  @Property({ nullable: true })
   picture: string;
 
   @Property({ nullable: true })

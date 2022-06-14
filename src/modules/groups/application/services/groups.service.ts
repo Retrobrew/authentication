@@ -8,7 +8,7 @@ import { CreateGroupDto } from '../dto/create-group.dto';
 import { ModifyGroupDto } from '../dto/modify-group.dto';
 import { User } from '../../../users/domain/entities/user.entity';
 import { DeleteGroupDto } from '../dto/delete-group.dto';
-import { GroupsMembership } from '../../domain/entities/groups_membership.entity';
+import { GroupsMembership } from '../../domain/entities/groups-membership.entity';
 import { JoinGroupDto, RequestGroup } from '../dto/join-group.dto';
 import { QuitGroupDto } from '../dto/quit-group.dto';
 
@@ -24,7 +24,7 @@ export class GroupsService {
     private readonly groupsRepository: EntityRepository<Groups>,
     @InjectRepository(GroupsMembership)
     private readonly groupMembership: EntityRepository<GroupsMembership>,
-    private readonly userService: UsersService,
+    private readonly userService: UsersService
   ) {}
 
   async create(request: CreateGroupDto): Promise<Groups> {
@@ -96,7 +96,6 @@ export class GroupsService {
     });
 
     const groupMembership = new GroupsMembership(
-      randomUUID(),
       result.user,
       result.group,
       new Date(),
@@ -112,7 +111,6 @@ export class GroupsService {
     });
 
     const groupMembership = new GroupsMembership(
-      randomUUID(),
       result.user,
       result.group,
       new Date(),
@@ -122,7 +120,7 @@ export class GroupsService {
   }
 
   private async _RequestValid(request: RequestGroup): Promise<UserAndGroup> {
-    // TODO : Autorisation + recupérer directement le user via token
+    // TODO : Autorisation
     const user = await this.userService.findOneByUuid(request.userUuid);
     if (!user) {
       throw new NotFoundException('User not found');
