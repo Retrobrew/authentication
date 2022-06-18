@@ -67,7 +67,7 @@ pipeline{
             steps{
                 withCredentials([usernamePassword(credentialsId: 'RETROBREW_BACK_PROD', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
                     nodejs(nodeJSInstallationName: 'nodejs'){
-                        sh('sshpass -p ${PASSWORD} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 22 -r dist/* ${USERNAME}@192.168.1.21:/home/prod/back/.')
+                        sh('sshpass -p ${PASSWORD} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 22 -r ./src ./*.json ${USERNAME}@192.168.1.21:/home/prod/back/.')
                     }
                 }
             }
