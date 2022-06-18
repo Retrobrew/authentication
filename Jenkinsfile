@@ -38,6 +38,16 @@ pipeline{
                 }
             }
         }
+        stage("Build"){
+            when {
+                branch 'master'
+            }
+            steps{
+                nodejs(nodeJSInstallationName: 'nodejs') {
+                    sh 'npm build'
+                }
+            }
+        }
         stage("Deploy to dev environment"){
             when {
                 branch 'dev/master'
