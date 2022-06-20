@@ -19,6 +19,8 @@ import { ModifyGroupDto } from '../application/dto/modify-group.dto';
 import { Groups } from '../domain/entities/groups.entity';
 import { Request } from 'express';
 import { DeleteGroupDto } from '../application/dto/delete-group.dto';
+import { JoinGroupDto } from '../application/dto/join-group.dto';
+import { QuitGroupDto } from '../application/dto/quit-group.dto';
 
 @UsePipes(
   new ValidationPipe({
@@ -84,6 +86,39 @@ export class GroupController {
 
     try {
       await this.groupsService.remove(deleteGroupDto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @Post(':groupUuid/join')
+  @HttpCode(202)
+  async join(
+    @Req() request: Request,
+    @Param('groupUuid') groupUuid: string
+  ): Promise<void> {
+    const user = request.user['userId'];
+    const joinGroupDto = new JoinGroupDto(user, groupUuid);
+
+    try {
+      await this.groupsService.join(joinGroupDto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @Post(':groupUuid/quit')
+  @HttpCode(202)
+  async quit(
+    @Req() request: Request,
+    @Param('groupUuid') groupUuid: string
+
+  ): Promise<void> {
+    const user = request.user['userId'];
+    const dto = new QuitGroupDto(user, groupUuid);
+
+    try {
+      await this.groupsService.quit(dto);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

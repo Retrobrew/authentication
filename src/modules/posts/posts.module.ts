@@ -11,11 +11,12 @@ import { GroupsService } from '../groups/application/services/groups.service';
 import { UsersService } from '../users/application/services/users.service';
 import { Groups } from '../groups/domain/entities/groups.entity';
 import { User } from '../users/domain/entities/user.entity';
+import { GroupsMembership } from '../groups/domain/entities/groups-membership.entity';
 
 
 @Module({
   imports: [
-    MikroOrmModule.forFeature({ entities: [Post, Groups, User] }),
+    MikroOrmModule.forFeature({ entities: [Post, Groups, User, GroupsMembership] }),
     UsersModule
   ],
   controllers: [

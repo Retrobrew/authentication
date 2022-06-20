@@ -3,6 +3,7 @@ import { Options } from '@mikro-orm/core';
 
 const logger = new Logger('MikroORM');
 const config: Options = {
+  forceEntityConstructor: true,
   entities: ["./dist/src/modules/*/domain/entities/*"],
   entitiesTs: ["./src/modules/*/domain/entities/*"],
   dbName: process.env.DATABASE_NAME,

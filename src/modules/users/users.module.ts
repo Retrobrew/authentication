@@ -17,10 +17,11 @@ import { Friendship } from './domain/entities/friendship.entity';
 import { UnfriendController } from './exposition/friendship/unfriend.controller';
 import { GroupsService } from '../groups/application/services/groups.service';
 import { Groups } from '../groups/domain/entities/groups.entity';
+import { GroupsMembership } from '../groups/domain/entities/groups-membership.entity';
 
 @Module({
   imports: [
-    MikroOrmModule.forFeature({ entities: [User, FriendRequest, Friendship, Groups] }),
+    MikroOrmModule.forFeature({ entities: [User, FriendRequest, Friendship, Groups, GroupsMembership] }),
     forwardRef(() => AuthenticationModule)
   ],
   controllers: [
