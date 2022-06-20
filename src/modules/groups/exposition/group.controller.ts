@@ -107,11 +107,18 @@ export class GroupController {
     }
   }
 
-  @Post('/quit')
+  @Post(':groupUuid/quit')
   @HttpCode(202)
-  async quit(@Body() request: QuitGroupDto): Promise<void> {
+  async quit(
+    @Req() request: Request,
+    @Param('groupUuid') groupUuid: string
+
+  ): Promise<void> {
+    const user = request.user['userId'];
+    const dto = new QuitGroupDto(user, groupUuid);
+
     try {
-      await this.groupsService.quit(request);
+      await this.groupsService.quit(dto);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

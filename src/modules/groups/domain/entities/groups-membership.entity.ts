@@ -21,4 +21,12 @@ export class GroupsMembership {
     this.group = group;
     this.adhesionDate = adhesionDate;
   }
+
+  public getGroup(): Groups {
+    return this.group;
+  }
+
+  public getUser(): User {
+    return this.user;
+  }
 }
