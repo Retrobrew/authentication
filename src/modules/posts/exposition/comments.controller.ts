@@ -1,6 +1,6 @@
 import {
   Body,
-  Controller, Delete, Param,
+  Controller, Delete, Get, Param,
   Post, Put,
   Req,
   UseGuards,
@@ -9,12 +9,13 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
-import { CommentPostRequestDto } from '../application/dto/comment/comment-post-request.dto';
+import { CommentPostRequestDto } from '../application/dto/comment/comment-post/comment-post-request.dto';
 import { CommentsService } from '../application/services/comments.service';
-import { CommentPostDto } from '../application/dto/comment/comment-post.dto';
-import { EditCommentRequestDto } from '../application/dto/comment/edit-comment-request.dto';
-import { EditCommentDto } from '../application/dto/comment/edit-comment.dto';
-import { DeleteCommentDto } from '../application/dto/comment/delete-comment.dto';
+import { CommentPostDto } from '../application/dto/comment/comment-post/comment-post.dto';
+import { EditCommentRequestDto } from '../application/dto/comment/edit-comment/edit-comment-request.dto';
+import { EditCommentDto } from '../application/dto/comment/edit-comment/edit-comment.dto';
+import { DeleteCommentDto } from '../application/dto/comment/delete-comment/delete-comment.dto';
+import { PostCommentsDto } from '../application/dto/comment/read-comments/post-comments.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -23,6 +24,14 @@ export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService
   ) {}
+
+  @Get(":uuid/comments")
+  async getComments(
+    @Param('uuid') postId: string,
+  ): Promise<Array<PostCommentsDto>> {
+
+    return this.commentsService.getPostComments(postId);
+  }
 
   @Post(":uuid/comment")
   async commentPost(

@@ -9,8 +9,7 @@ export class FeedPostDto {
   public readonly content: string;
   public readonly media: Buffer;
   public readonly createdAt: Date;
-  public readonly postedIn: string;
-  public readonly postedInDto: PostedInDto;
+  public readonly postedIn: PostedInDto;
 
   constructor(
     uuid: string,
@@ -20,8 +19,7 @@ export class FeedPostDto {
     content: string,
     media: Buffer,
     createdAt: Date,
-    postedIn: string,
-    postedInDto: PostedInDto = null
+    postedIn: PostedInDto = null
   ) {
     this.uuid = uuid;
     this.title = title;
@@ -31,6 +29,5 @@ export class FeedPostDto {
     this.media = media;
     this.createdAt = createdAt;
     this.postedIn = postedIn;
-    this.postedInDto = postedInDto;
   }
 }

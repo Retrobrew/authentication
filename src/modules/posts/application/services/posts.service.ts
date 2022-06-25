@@ -9,7 +9,6 @@ import { User } from '../../../users/domain/entities/user.entity';
 import { DeletePostDto } from '../dto/post/delete-post.dto';
 import { FeedPostDto } from '../dto/post/feed-post.dto';
 import { AuthorDto } from '../dto/post/author.dto';
-import { QueryOrder } from '@mikro-orm/core';
 import { Groups } from '../../../groups/domain/entities/groups.entity';
 import { GroupsService } from '../../../groups/application/services/groups.service';
 import { PostedInDto } from '../dto/post/posted-in.dto';
@@ -86,7 +85,7 @@ export class PostsService {
   }
 
   async getPost(postId: string): Promise<Post> {
-    return this.postsRepository.findOne({uuid: postId});
+    return this.postsRepository.findOne({ uuid: postId }, { populateWhere: ['author', 'postedIn'] });
   }
 
   async deletePost(deletePostDto: DeletePostDto): Promise<void> {
@@ -111,50 +110,25 @@ export class PostsService {
   async getUserFeed(userId: string): Promise<Array<FeedPostDto>> {
     const user: User = await this.userRepository.findOneByUuid(userId);
     const friendsPosts = await this.postsRepository.getUserFeed(user);
-    const userPosts: Array<Post> = await this.postsRepository
-      .find(
-        {author: user, parent: null},
-        {fields: [
-            // @ts-ignore
-            'uuid', 'title', 'comments','author', 'createdAt', 'content', 'media', 'postedIn', { author: ['uuid', 'username']}, { comments: ['uuid']}
-            // @ts-ignore
-          ], orderBy: { createdAt: QueryOrder.DESC }
-        }
-      );
     const postsFeed: Array<FeedPostDto> = [];
 
     friendsPosts.forEach((post: any) => {
       const authorDto = new AuthorDto(
-        post.authorId,
-        post.author
-      );
-      const feedPost = new FeedPostDto(
-        post.uuid,
-        post.title,
-        0,
-        authorDto,
-        post.content,
-        null,
-        post.createdAt,
-        post.postedIn?.uuid
-      );
-      postsFeed.push(feedPost);
-    })
-
-    userPosts.forEach((post: any) => {
-      const authorDto = new AuthorDto(
-        post.author.getUuid(),
+        post.author.uuid,
         post.author.username
       );
+
+      const groupDto = new PostedInDto(post.postedIn);
+
       const feedPost = new FeedPostDto(
         post.uuid,
         post.title,
         post.comments.length,
         authorDto,
         post.content,
-        post.media,
+        null,
         post.createdAt,
-        post.postedIn?.uuid
+        groupDto
       );
       postsFeed.push(feedPost);
     })
@@ -175,14 +149,7 @@ export class PostsService {
         post.author.username
       );
 
-      let postedInDto = null;
-
-      if(post.postedIn){
-        postedInDto = new PostedInDto(
-          post.postedIn.uuid,
-          post.postedIn.name
-        )
-      }
+      const groupDto = new PostedInDto(post.postedIn);
 
       const feedPost = new FeedPostDto(
         post.uuid,
@@ -192,8 +159,7 @@ export class PostsService {
         post.content,
         null,
         post.createdAt,
-        post.postedIn?.uuid,
-        postedInDto
+        groupDto
       );
       feedPosts.push(feedPost);
 
@@ -220,7 +186,7 @@ export class PostsService {
         post.content,
         null,
         post.createdAt,
-        post.postedIn?.uuid
+        new PostedInDto(post.postedIn)
       );
       feedPosts.push(feedPost);
 

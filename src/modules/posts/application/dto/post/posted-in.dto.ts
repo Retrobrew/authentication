@@ -1,10 +1,20 @@
+import { Groups } from '../../../../groups/domain/entities/groups.entity';
+
 export class PostedInDto {
-  public readonly uuid: string;
-  public readonly name: string;
+  public uuid: string;
+  public name: string;
 
+  constructor(group?: Groups) {
+    if(!group){
+      return;
+    }
 
-  constructor(uuid: string, name: string) {
-    this.uuid = uuid;
-    this.name = name;
+    this.uuid = group.getUuid();
+    this.name = group.getName();
+
+    if(group.getUuid() === "home") {
+      this.name = group.getUuid();
+    }
   }
+
 }
