@@ -53,7 +53,7 @@ export class Groups {
     return this.createdBy;
   }
 
-  public getName(): String {
+  public getName(): string {
     return this.name
   }
 
@@ -64,5 +64,9 @@ export class Groups {
     });
 
     return members;
+  }
+
+  public getUuid(): string {
+    return this.uuid;
   }
 }

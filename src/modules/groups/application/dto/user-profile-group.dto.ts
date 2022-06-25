@@ -1,11 +1,11 @@
 export class UserProfileGroupDto {
-  public readonly groupUuid: String;
-  public readonly groupName: String;
+  public readonly groupUuid: string;
+  public readonly groupName: string;
   public readonly creator: boolean;
 
   constructor(
-    groupUuid: String,
-    groupName: String,
+    groupUuid: string,
+    groupName: string,
     creator: boolean
   ) {
     this.groupUuid = groupUuid;

@@ -118,15 +118,7 @@ export class PostsService {
         post.author.username
       );
 
-      const groupDto = new PostedInDto();
-
-      if(post.postedIn === "home"){
-        groupDto.name = post.postedIn;
-      }
-
-      if(post.postedIn){
-        console.log(post.postedIn);
-      }
+      const groupDto = new PostedInDto(post.postedIn);
 
       const feedPost = new FeedPostDto(
         post.uuid,
@@ -136,7 +128,6 @@ export class PostsService {
         post.content,
         null,
         post.createdAt,
-        post.postedIn?.uuid,
         groupDto
       );
       postsFeed.push(feedPost);
@@ -158,14 +149,7 @@ export class PostsService {
         post.author.username
       );
 
-      let postedInDto = null;
-
-      if(post.postedIn){
-        // postedInDto = new PostedInDto(
-        //   post.postedIn.uuid,
-        //   post.postedIn.name
-        // )
-      }
+      const groupDto = new PostedInDto(post.postedIn);
 
       const feedPost = new FeedPostDto(
         post.uuid,
@@ -175,8 +159,7 @@ export class PostsService {
         post.content,
         null,
         post.createdAt,
-        post.postedIn?.uuid,
-        postedInDto
+        groupDto
       );
       feedPosts.push(feedPost);
 
@@ -203,7 +186,7 @@ export class PostsService {
         post.content,
         null,
         post.createdAt,
-        post.postedIn?.uuid
+        new PostedInDto(post.postedIn)
       );
       feedPosts.push(feedPost);
 
