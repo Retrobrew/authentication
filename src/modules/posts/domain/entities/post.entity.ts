@@ -1,5 +1,4 @@
 import {
-  BlobType,
   Cascade,
   Collection,
   Entity,
@@ -28,8 +27,8 @@ export class Post {
   @Property({type: TextType})
   private content: string;
 
-  @Property({ type: BlobType, nullable: true })
-  private media?: Buffer;
+  @Property({ nullable: true })
+  private media?: string;
 
   @OneToMany('Post', 'parent', { cascade: [Cascade.ALL] })
   private comments = new Collection<Post>(this);
@@ -74,7 +73,7 @@ export class Post {
       post.title = title;
     }
     if(media){
-      post.media = media;
+      post.media = "todo";
     }
 
     if(postedIn){
@@ -106,12 +105,24 @@ export class Post {
     return this.uuid;
   }
 
+  getTitle(): string {
+    return this.title;
+  }
+
   changeTitle(newTitle: string): void {
     this.title = newTitle;
   }
 
+  getContent(): string {
+    return this.content;
+  }
+
   changeContent(changedContent: string): void {
     this.content = changedContent;
+  }
+
+  getLastUpdatedAt(): Date {
+    return this.lastUpdatedAt;
   }
 
   changeEditDate(editDate: Date): void {
@@ -124,6 +135,18 @@ export class Post {
 
   isComment(): boolean {
     return this.parent != undefined;
+  }
+
+  getPostedInGroup(): Groups | string {
+    return this.postedIn;
+  }
+
+  getComments(): Array<Post> {
+    return this.comments.getItems();
+  }
+
+  getMedia(): string {
+    return "";
   }
 
 

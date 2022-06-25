@@ -6,8 +6,8 @@ export class CreateGroupDto {
   @Transform(({ value }: TransformFnParams) => value.trim())
   name: string;
 
-  @IsNotEmpty()
-  @Transform(({ value }: TransformFnParams) => value.trim())
+  // @IsNotEmpty()
+  // @Transform(({ value }: TransformFnParams) => value.trim())
   picture: string;
 
   description: string;

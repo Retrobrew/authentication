@@ -1,19 +1,55 @@
-import { CommentPostDto } from '../dto/comment/comment-post.dto';
-import { BadRequestException } from '@nestjs/common';
+import { CommentPostDto } from '../dto/comment/comment-post/comment-post.dto';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Post } from '../../domain/entities/post.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { PostRepository } from '../post.repository';
 import { UsersService } from '../../../users/application/services/users.service';
-import { EditCommentDto } from '../dto/comment/edit-comment.dto';
-import { DeleteCommentDto } from '../dto/comment/delete-comment.dto';
+import { EditCommentDto } from '../dto/comment/edit-comment/edit-comment.dto';
+import { DeleteCommentDto } from '../dto/comment/delete-comment/delete-comment.dto';
+import { PostCommentsDto } from '../dto/comment/read-comments/post-comments.dto';
+import { AuthorDto } from '../dto/post/author.dto';
 
 export class CommentsService {
   constructor(
     @InjectRepository(Post)
     private readonly postsRepository: PostRepository,
-    // plutôt  utiliser le repository ?
     private readonly usersService: UsersService
   ) {}
+
+  async getPostComments(postUuid: string): Promise<Array<PostCommentsDto>> {
+    const post = await this.postsRepository.findOne(
+      { uuid: postUuid },
+      // @ts-ignore
+      { populate: ['comments']}
+    );
+
+    if(!post) {
+      throw new NotFoundException("Post not found")
+    }
+
+    const commentsDto = [];
+
+    post.getComments()
+      .forEach((comment) => {
+        const authorDto = new AuthorDto(
+          comment.getAuthor().getUuid(),
+          comment.getAuthor().getUsername()
+        );
+
+        const postComment = new PostCommentsDto(
+          comment.getUuid(),
+          comment.getTitle(),
+          comment.getContent(),
+          authorDto,
+          comment.getLastUpdatedAt(),
+          comment.getMedia()
+        );
+
+        commentsDto.push(postComment);
+      })
+
+    return commentsDto;
+  }
 
   async commentPost(commentPostDto: CommentPostDto): Promise<string> {
     const user = await this.usersService.findOneByUuid(commentPostDto.author);
@@ -22,7 +58,7 @@ export class CommentsService {
       throw new BadRequestException("Utilisateur inconnus")
     }
 
-    const post = await this.postsRepository.findOne({uuid: commentPostDto.parent});
+    const post = await this.postsRepository.findOne({ uuid: commentPostDto.parent });
     if(!post){
       throw new BadRequestException("Cette publication n'existe pas")
     }

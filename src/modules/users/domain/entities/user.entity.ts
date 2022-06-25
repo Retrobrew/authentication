@@ -125,8 +125,13 @@ export class User {
     return !!friendship;
   }
 
-  getFriends() {
-    return this.friends
+  getFriends(): Array<User> {
+    const friends = [];
+    this.friends.getItems().forEach((user) => {
+      friends.push(user.getFriendB())
+    })
+
+    return friends;
   }
 
   addFriend(friend: User) {
