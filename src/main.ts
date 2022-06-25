@@ -16,7 +16,10 @@ async function bootstrap() {
   // const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Activation des CORS pour le déploiement sur environnement de dev
-  //app.enableCors();
+  app.enableCors({
+    allowedHeaders: '*',
+    origin: '*',
+  });
   await app.listen(process.env.PORT || port);
 }
 bootstrap();
