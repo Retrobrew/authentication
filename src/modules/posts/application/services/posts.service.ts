@@ -85,7 +85,7 @@ export class PostsService {
   }
 
   async getPost(postId: string): Promise<Post> {
-    return this.postsRepository.findOne({uuid: postId});
+    return this.postsRepository.findOne({ uuid: postId }, { populateWhere: ['author', 'postedIn'] });
   }
 
   async deletePost(deletePostDto: DeletePostDto): Promise<void> {
