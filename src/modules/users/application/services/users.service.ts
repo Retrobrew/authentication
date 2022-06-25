@@ -45,7 +45,8 @@ export class UsersService {
   }
 
   async findOneByUuid(uuid: string): Promise<User | undefined> {
-    return await this.userRepository.findOne({ uuid: uuid });
+    // @ts-ignore
+    return await this.userRepository.findOne({ uuid: uuid }, { populate: ['friends.friendB.uuid'] });
   }
 
   async findOneByEmail(email: string): Promise<User | undefined> {
