@@ -1,21 +1,31 @@
 import { EntityRepository } from '@mikro-orm/mysql';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import {
-  Groups,
-} from 'src/modules/groups/domain/entities/groups.entity';
+import { Groups } from 'src/modules/groups/domain/entities/groups.entity';
 import { UsersService } from 'src/modules/users/application/services/users.service';
 import { CreateGroupDto } from '../dto/create-group.dto';
 import { ModifyGroupDto } from '../dto/modify-group.dto';
 import { User } from '../../../users/domain/entities/user.entity';
+import { DeleteGroupDto } from '../dto/delete-group.dto';
+import { GroupsMembership } from '../../domain/entities/groups-membership.entity';
+import { JoinGroupDto, RequestGroup } from '../dto/join-group.dto';
+import { QuitGroupDto } from '../dto/quit-group.dto';
+import { UserProfileGroupDto } from '../dto/user-profile-group.dto';
+
+export interface UserAndGroup {
+  user: User;
+  group: Groups;
+}
 
 @Injectable()
 export class GroupsService {
   constructor(
     @InjectRepository(Groups)
     private readonly groupsRepository: EntityRepository<Groups>,
-    private readonly userService: UsersService,
+    @InjectRepository(GroupsMembership)
+    private readonly groupMembership: EntityRepository<GroupsMembership>,
+    private readonly userService: UsersService
   ) {}
 
   async create(request: CreateGroupDto): Promise<Groups> {
@@ -46,9 +56,18 @@ export class GroupsService {
     await this.groupsRepository.flush();
   }
 
-  async remove(groupUuid: string): Promise<void> {
-    // TODO : autorisation
-    const group = await this.groupsRepository.findOne(groupUuid);
+  async remove(deleteGroupDto: DeleteGroupDto): Promise<void> {
+    const user: User = await this.userService.findOneByUuid(deleteGroupDto.userUuid);
+
+    if(!user){
+      throw new BadRequestException("User unknown");
+    }
+    const group = await this.groupsRepository.findOne(deleteGroupDto.groupUuid);
+
+    if(group.getCreator() !== user) {
+      throw new ForbiddenException("Operation denied");
+    }
+
     await this.groupsRepository.removeAndFlush(group);
   }
 
@@ -57,12 +76,109 @@ export class GroupsService {
   }
 
   async find(uuid: string): Promise<Groups> {
-    return await this.groupsRepository.findOne(uuid);
+    return await this.groupsRepository.findOne(
+      { uuid: uuid },
+      // @ts-ignore
+      { fields: ['uuid', 'name', 'isProject', 'createdBy', 'members', 'picture', 'description'] }
+    );
   }
 
-  async getUserGroups(userUuid: string): Promise<Array<Groups>> {
-    const user: User = await this.userService.findOneByUuid(userUuid)
+  async getUserGroups(userUuid: string): Promise<Array<UserProfileGroupDto>> {
+    const user: User = await this.userService.findOneByUuid(userUuid);
 
-    return await this.groupsRepository.find({createdBy: user})
+    if(!user){
+      throw new BadRequestException("User unknown");
+    }
+    const groups: Array<UserProfileGroupDto> = [];
+
+    const groupAsMember: Array<GroupsMembership> = await this.groupMembership.find(
+      { user: user },
+      { fields: [
+          // @ts-ignore
+          'id', 'group', { group: ['name', 'uuid'] }
+        ]
+      });
+
+    groupAsMember.forEach((membership) => {
+      const dto = new UserProfileGroupDto(
+        membership.getGroup().uuid,
+        membership.getGroup().getName(),
+        false
+      );
+      groups.push(dto);
+    });
+
+    const groupAsCreator: Array<Groups> = await this.groupsRepository.find(
+      // @ts-ignore
+      { createdBy: user },
+      { fields: ['name', 'uuid'] }
+      );
+
+    groupAsCreator.forEach((group) => {
+      const dto = new UserProfileGroupDto(
+        group.uuid,
+        group.getName(),
+        true
+      );
+      groups.push(dto);
+    })
+
+    return groups;
+  }
+
+  async join(request: JoinGroupDto): Promise<void> {
+    const result = await this._RequestValid({
+      groupUuid: request.groupUuid,
+      userUuid: request.userUuid,
+    });
+
+    const membership = await this.groupMembership.findOne({ user: result.user, group: result.group });
+
+    if(membership){
+      throw new BadRequestException("User is already a member of this group");
+    }
+
+    const groupMembership = new GroupsMembership(
+      result.user,
+      result.group,
+      new Date(),
+    );
+
+    await this.groupMembership.persistAndFlush(groupMembership);
+  }
+
+  async quit(request: QuitGroupDto): Promise<void> {
+    const result = await this._RequestValid({
+      groupUuid: request.groupUuid,
+      userUuid: request.userUuid,
+    });
+
+    const groupMembership = await this.groupMembership.findOne(
+      { group: result.group, user: result.user }
+    );
+
+    if(!groupMembership){
+      throw new BadRequestException("User is not part of this group")
+    }
+
+    await this.groupMembership.removeAndFlush(groupMembership);
+  }
+
+  private async _RequestValid(request: RequestGroup): Promise<UserAndGroup> {
+    // TODO : Autorisation
+    const user = await this.userService.findOneByUuid(request.userUuid);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const group = await this.find(request.groupUuid);
+    if (!group) {
+      throw new NotFoundException('Group not found');
+    }
+
+    return <UserAndGroup>{
+      user,
+      group,
+    };
   }
 }

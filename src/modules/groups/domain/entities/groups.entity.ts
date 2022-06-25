@@ -1,5 +1,6 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
 import { User } from '../../../users/domain/entities/user.entity';
+import { GroupsMembership } from './groups-membership.entity';
 
 export interface IGroups {
   uuid: string;
@@ -17,9 +18,9 @@ export class Groups {
   uuid: string;
 
   @Property()
-  name: string;
+  private name: string;
 
-  @Property()
+  @Property({ nullable: true })
   picture: string;
 
   @Property({ nullable: true })
@@ -32,7 +33,11 @@ export class Groups {
   isProject: boolean;
 
   @ManyToOne(() => User)
-  createdBy: User;
+  private readonly createdBy: User;
+
+  // @ts-ignore
+  @OneToMany(() => GroupsMembership, gm => gm.group)
+  private members: Collection<GroupsMembership>;
 
   constructor(group: IGroups) {
     this.uuid = group.uuid;
@@ -42,5 +47,26 @@ export class Groups {
     this.description = group.description;
     this.isProject = group.isProject;
     this.createdBy = group.createdBy;
+  }
+
+  public getCreator(): User {
+    return this.createdBy;
+  }
+
+  public getName(): string {
+    return this.name
+  }
+
+  public getMembers(): Array<User> {
+    const members = [];
+    this.members.getItems().forEach((membership) => {
+      members.push(membership.getUser())
+    });
+
+    return members;
+  }
+
+  public getUuid(): string {
+    return this.uuid;
   }
 }
