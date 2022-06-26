@@ -1,8 +1,8 @@
 import { Post } from '../../domain/entities/post.entity';
-import { EditPostDto } from '../dto/post/edit-post.dto';
-import { CreatePostDto } from '../dto/post/create-post.dto';
+import { EditPostDto } from '../dto/post/edit-post/edit-post.dto';
+import { CreatePostDto } from '../dto/post/create-post/create-post.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../../../users/application/services/users.service';
 import { PostRepository } from '../post.repository';
 import { User } from '../../../users/domain/entities/user.entity';
@@ -12,6 +12,7 @@ import { AuthorDto } from '../dto/post/author.dto';
 import { Groups } from '../../../groups/domain/entities/groups.entity';
 import { GroupsService } from '../../../groups/application/services/groups.service';
 import { PostedInDto } from '../dto/post/posted-in.dto';
+import { PostLikeDto } from '../dto/post/post-like.dto';
 
 export class PostsService {
   constructor(
@@ -86,6 +87,42 @@ export class PostsService {
 
   async getPost(postId: string): Promise<Post> {
     return this.postsRepository.findOne({ uuid: postId }, { populateWhere: ['author', 'postedIn'] });
+  }
+
+  async likePost(postLikeDto: PostLikeDto): Promise<void> {
+    const user = await this.userRepository.findOneByUuid(postLikeDto.userUuid);
+    if(!user){
+      throw new NotFoundException("User not found");
+    }
+
+    const post = await this.postsRepository
+      .findOne({ uuid: postLikeDto.postUuid }, { populate: true })
+    ;
+    if(!post){
+      throw new NotFoundException("User not found");
+    }
+
+    post.addLike(user);
+
+    await this.postsRepository.persistAndFlush(post)
+  }
+
+  async unlikePost(postLikeDto: PostLikeDto): Promise<void> {
+    const user = await this.userRepository.findOneByUuid(postLikeDto.userUuid);
+    if(!user){
+      throw new NotFoundException("User not found");
+    }
+
+    const post = await this.postsRepository
+      .findOne({ uuid: postLikeDto.postUuid }, { populate: true })
+    ;
+    if(!post){
+      throw new NotFoundException("User not found");
+    }
+
+    post.unlike(user);
+
+    await this.postsRepository.persistAndFlush(post)
   }
 
   async deletePost(deletePostDto: DeletePostDto): Promise<void> {

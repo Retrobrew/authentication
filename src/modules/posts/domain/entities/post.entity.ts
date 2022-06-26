@@ -157,6 +157,14 @@ export class Post {
     return this.likes.getItems()
   }
 
+  addLike(user: User): void {
+    this.likes.add(user);
+  }
+
+  unlike(user: User): void {
+    this.likes.remove(user);
+  }
+
 
 
 
