@@ -36,7 +36,7 @@ export class Groups {
   private readonly createdBy: User;
 
   // @ts-ignore
-  @OneToMany(() => GroupsMembership, gm => gm.group)
+  @OneToMany(() => GroupsMembership, gm => gm.group, { nullable: true })
   private members: Collection<GroupsMembership>;
 
   constructor(group: IGroups) {

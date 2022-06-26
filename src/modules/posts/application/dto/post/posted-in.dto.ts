@@ -11,10 +11,6 @@ export class PostedInDto {
 
     this.uuid = group.getUuid();
     this.name = group.getName();
-
-    if(group.getUuid() === "home") {
-      this.name = group.getUuid();
-    }
   }
 
 }
