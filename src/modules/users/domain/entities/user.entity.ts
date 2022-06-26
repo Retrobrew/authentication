@@ -1,9 +1,10 @@
-import { Collection, Embedded, Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import { Collection, Embedded, Entity, ManyToMany, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
 import { randomUUID } from 'crypto';
 import { Credentials } from './credentials.entity';
 import { UserRepository } from '../../application/user.repository';
 import { FriendRequest } from './friend-request.entity';
 import { Friendship } from './friendship.entity';
+import { Post } from '../../../posts/domain/entities/post.entity';
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
@@ -14,7 +15,7 @@ export class User {
   @Property()
   private email: string;
 
-  @Property({nullable: true})
+  @Property({ nullable: true })
   private dateOfBirth: Date;
 
   @Property()
@@ -26,7 +27,7 @@ export class User {
   @Property()
   private username: string;
 
-  @Property({nullable: true})
+  @Property({ nullable: true })
   private picture: string;
 
   @Embedded(
@@ -36,6 +37,10 @@ export class User {
     }
   )
   private credentials: Credentials;
+
+  // @ts-ignore
+  @ManyToMany(() => Post, post => post.likes, { nullable: true })
+  private likedPosts: Collection<Post>;
 
   @OneToMany('FriendRequest', 'requester')
   private sentRequests = new Collection<FriendRequest>(this);
@@ -142,6 +147,10 @@ export class User {
       startDate
     );
     this.friends.add(friendship);
+  }
+
+  getLikedPosts(): Array<Post> {
+    return this.likedPosts.getItems();
   }
 
 }
