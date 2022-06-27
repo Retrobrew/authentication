@@ -10,6 +10,8 @@ export class FeedPostDto {
   public readonly media: Buffer;
   public readonly createdAt: Date;
   public readonly postedIn: PostedInDto;
+  public readonly likedByUser: boolean;
+  public readonly likesNb: number;
 
   constructor(
     uuid: string,
@@ -19,7 +21,9 @@ export class FeedPostDto {
     content: string,
     media: Buffer,
     createdAt: Date,
-    postedIn: PostedInDto = null
+    postedIn: PostedInDto = null,
+    likedByUser: boolean,
+    likesNb: number
   ) {
     this.uuid = uuid;
     this.title = title;
@@ -29,5 +33,7 @@ export class FeedPostDto {
     this.media = media;
     this.createdAt = createdAt;
     this.postedIn = postedIn;
+    this.likedByUser = likedByUser;
+    this.likesNb = likesNb;
   }
 }

@@ -8,18 +8,19 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { CreatePostRequestDto } from '../application/dto/post/create-post-request.dto';
+import { CreatePostRequestDto } from '../application/dto/post/create-post/create-post-request.dto';
 import { Request } from 'express';
-import { EditPostDto } from '../application/dto/post/edit-post.dto';
+import { EditPostDto } from '../application/dto/post/edit-post/edit-post.dto';
 import { PostsService } from '../application/services/posts.service';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
 import { Post as UserPost } from '../domain/entities/post.entity';
-import { CreatePostDto } from '../application/dto/post/create-post.dto';
-import { EditPostRequestDto } from '../application/dto/post/edit-post-request.dto';
+import { CreatePostDto } from '../application/dto/post/create-post/create-post.dto';
+import { EditPostRequestDto } from '../application/dto/post/edit-post/edit-post-request.dto';
 import { DeletePostDto } from '../application/dto/post/delete-post.dto';
 import { UuidDto } from '../application/dto/uuid.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import { PostLikeDto } from '../application/dto/post/post-like.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -47,6 +48,28 @@ export class PostsController {
     createPostDto.postedIn  = createPostRequest.postedIn;
 
     return new UuidDto(await this.postsService.createPost(createPostDto));
+  }
+
+  @Put(":uuid/like")
+  async likePost(
+    @Req() req: Request,
+    @Param('uuid') post: string,
+  ): Promise<void> {
+    const user = req.user['userId'];
+    const postLikeDto = new PostLikeDto(post, user);
+
+    return this.postsService.likePost(postLikeDto)
+  }
+
+  @Put(":uuid/unlike")
+  async unlikePost(
+    @Req() req: Request,
+    @Param('uuid') post: string,
+  ): Promise<void> {
+    const user = req.user['userId'];
+    const postLikeDto = new PostLikeDto(post, user);
+
+    return this.postsService.unlikePost(postLikeDto)
   }
 
   @Put(":uuid")
