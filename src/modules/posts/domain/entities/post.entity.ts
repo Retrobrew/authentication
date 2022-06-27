@@ -1,7 +1,7 @@
 import {
   Cascade,
   Collection,
-  Entity,
+  Entity, ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryKey,
@@ -21,7 +21,7 @@ export class Post {
   @Property({ nullable: true })
   private title?: string;
 
-  @ManyToOne()
+  @ManyToOne(() => User)
   private readonly author: User;
 
   @Property({type: TextType})
@@ -35,6 +35,10 @@ export class Post {
 
   @ManyToOne(() => Post,{ nullable: true })
   private parent?: Post;
+
+  // @ts-ignore
+  @ManyToMany(() => User, 'likedPosts', { owner: true, nullable: true })
+  private likes: Collection<User>;
 
   @Property()
   private createdAt: Date;
@@ -121,6 +125,10 @@ export class Post {
     this.content = changedContent;
   }
 
+  getCreatedAt(): Date {
+    return this.createdAt;
+  }
+
   getLastUpdatedAt(): Date {
     return this.lastUpdatedAt;
   }
@@ -137,7 +145,7 @@ export class Post {
     return this.parent != undefined;
   }
 
-  getPostedInGroup(): Groups | string {
+  getPostedInGroup(): Groups {
     return this.postedIn;
   }
 
@@ -147,6 +155,18 @@ export class Post {
 
   getMedia(): string {
     return "";
+  }
+
+  getLikes(): Array<User> {
+    return this.likes.getItems()
+  }
+
+  addLike(user: User): void {
+    this.likes.add(user);
+  }
+
+  unlike(user: User): void {
+    this.likes.remove(user);
   }
 
 

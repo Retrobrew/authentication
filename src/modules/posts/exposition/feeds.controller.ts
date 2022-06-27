@@ -8,7 +8,6 @@ import { GroupsService } from '../../groups/application/services/groups.service'
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('feeds')
-
 export class FeedsController {
   constructor(
     private readonly postsService: PostsService,
@@ -31,13 +30,16 @@ export class FeedsController {
     return await this.postsService.getHomeFeed();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get("group/:groupUuid")
   async getGroupFeed(
     @Req() req: Request,
     @Param('groupUuid') groupUuid: string
   ): Promise<Array<FeedPostDto>> {
+    const user = req.user["userId"];
+    console.log(user);
     const group: Groups = await this.groupsService.find(groupUuid);
 
-    return await this.postsService.getGroupFeed(group);
+    return await this.postsService.getGroupFeed(group, user);
   }
 }
