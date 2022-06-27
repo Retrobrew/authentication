@@ -125,6 +125,10 @@ export class Post {
     this.content = changedContent;
   }
 
+  getCreatedAt(): Date {
+    return this.createdAt;
+  }
+
   getLastUpdatedAt(): Date {
     return this.lastUpdatedAt;
   }
@@ -141,7 +145,7 @@ export class Post {
     return this.parent != undefined;
   }
 
-  getPostedInGroup(): Groups | string {
+  getPostedInGroup(): Groups {
     return this.postedIn;
   }
 
