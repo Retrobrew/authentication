@@ -37,7 +37,7 @@ export class FeedsController {
     @Param('groupUuid') groupUuid: string
   ): Promise<Array<FeedPostDto>> {
     const user = req.user["userId"];
-    console.log(user);
+
     const group: Groups = await this.groupsService.find(groupUuid);
 
     return await this.postsService.getGroupFeed(group, user);
