@@ -8,6 +8,7 @@ import { ChangePasswordDto } from '../dto/user/change-password.dto';
 import { Credentials } from '../../domain/entities/credentials.entity';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../user.repository';
+import { FriendDto } from '../dto/user/friend.dto';
 
 @Injectable()
 export class UsersService {
@@ -40,8 +41,40 @@ export class UsersService {
     return user;
   }
 
-  async findAll() {
-    return await this.userRepository.findAll();
+  async findAll(userId: string): Promise<Array<FriendDto>> {
+    const user = await this.userRepository.findOne({uuid: userId}, {populate: true});
+    if(!user) {
+      throw new BadRequestException("Nope");
+    }
+
+    const admin = await this.userRepository.findOne({ username: 'admin' });
+    if(!admin) {
+      console.log("Could not found admin")
+    }
+
+    const users = await this.userRepository.find(
+      {
+        $nin: user.getFriends(),
+        // @ts-ignore
+        $ne: {  $and: [user, admin] },
+      },
+      // @ts-ignore
+      {fields: ['uuid', 'username', 'picture', 'country']}
+    );
+
+    const friends: Array<FriendDto> = [];
+
+    users.forEach(user => {
+      const friendDto = new FriendDto(
+        user.getUsername(),
+        user.getPicture(),
+        user.getCountry(),
+        user.getUuid()
+      );
+      friends.push(friendDto);
+    })
+
+    return friends;
   }
 
   async findOneByUuid(uuid: string): Promise<User | undefined> {
