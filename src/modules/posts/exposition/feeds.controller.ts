@@ -1,5 +1,5 @@
 import { PostsService } from '../application/services/posts.service';
-import { Controller, Get, Param, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
 import { Request } from 'express';
 import { FeedPostDto } from '../application/dto/post/feed-post.dto';
@@ -27,7 +27,11 @@ export class FeedsController {
   async getHomeFeed(
     @Req() req: Request
   ): Promise<Array<FeedPostDto>> {
-    return await this.postsService.getHomeFeed();
+    try {
+      return await this.postsService.getHomeFeed();
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @UseGuards(JwtAuthGuard)

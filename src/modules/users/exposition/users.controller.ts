@@ -9,6 +9,7 @@ import {
   Put,
   UseGuards,
   UsePipes,
+  Request,
   ValidationPipe,
 } from '@nestjs/common';
 import { UserRegistrationDto } from '../application/dto/user/user-registration.dto';
@@ -18,6 +19,7 @@ import { ChangeEmailDto } from '../application/dto/user/change-email.dto';
 import { ChangeUsernameDto } from '../application/dto/user/change-username.dto';
 import { ChangePasswordDto } from '../application/dto/user/change-password.dto';
 import { AuthenticationService } from '../../authentication/authentication.service';
+import { FriendDto } from '../application/dto/user/friend.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('users')
@@ -43,8 +45,10 @@ export class UsersController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.usersService.findAll();
+  findAll(
+    @Request() request
+  ): Promise<Array<FriendDto>> {
+    return this.usersService.findAll(request.user['userId']);
   }
 
   @Put(':uuid/email')
