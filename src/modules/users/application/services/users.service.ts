@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../../domain/entities/user.entity';
 import { UserRegistrationDto } from '../dto/user/user-registration.dto';
@@ -8,13 +8,19 @@ import { ChangePasswordDto } from '../dto/user/change-password.dto';
 import { Credentials } from '../../domain/entities/credentials.entity';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../user.repository';
-import { FriendDto } from '../dto/user/friend.dto';
+import { FriendDto } from '../dto/friend/friend.dto';
+import { FindUserDto } from '../dto/user/find-user.dto';
+import { FriendRequest } from '../../domain/entities/friend-request.entity';
+import { EntityRepository } from '@mikro-orm/mysql';
+import { UserProfileDto } from '../dto/user/user-profile.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    @InjectRepository(FriendRequest)
+    private readonly friendRequestRepository: EntityRepository<FriendRequest>
   ) {}
 
   async registrate(registrationDto: UserRegistrationDto): Promise<User> {
@@ -42,39 +48,65 @@ export class UsersService {
   }
 
   async findAll(userId: string): Promise<Array<FriendDto>> {
-    const user = await this.userRepository.findOne({uuid: userId}, {populate: true});
-    if(!user) {
-      throw new BadRequestException("Nope");
-    }
-
-    const admin = await this.userRepository.findOne({ username: 'admin' });
-    if(!admin) {
-      console.log("Could not found admin")
-    }
-
-    const users = await this.userRepository.find(
-      {
-        $nin: user.getFriends(),
-        // @ts-ignore
-        $ne: {  $and: [user, admin] },
-      },
-      // @ts-ignore
-      {fields: ['uuid', 'username', 'picture', 'country']}
-    );
-
+    const users = await this.userRepository.findAllExceptUserAndAdmin(userId);
     const friends: Array<FriendDto> = [];
 
-    users.forEach(user => {
+    users.forEach((user: any) => {
       const friendDto = new FriendDto(
-        user.getUsername(),
-        user.getPicture(),
-        user.getCountry(),
-        user.getUuid()
+        user.username,
+        user.picture,
+        user.country,
+        user.uuid
       );
       friends.push(friendDto);
-    })
+    });
 
     return friends;
+  }
+
+  async getUserProfile(findUser: FindUserDto): Promise<UserProfileDto> {
+    const connectedUser: User = await this.userRepository.findOne(
+      { uuid: findUser.userUuid },
+      // @ts-ignore
+      { populate: true }
+    );
+
+    if(!connectedUser){
+      throw new NotFoundException("User not found");
+    }
+
+    const userToFind: User = await this.userRepository.findOne(
+      { uuid: findUser.userToFindUuid },
+      // @ts-ignore
+      { populate: ['friends.friendB.uuid'] }
+    );
+
+    if(!userToFind){
+      throw new NotFoundException("User not found");
+    }
+
+    const friendRequest: FriendRequest = await this.friendRequestRepository.findOne(
+      {
+        // @ts-ignore
+        requester: connectedUser,
+        recipient: userToFind
+      }
+    );
+
+    let friendshipStatus = null;
+    if(friendRequest) {
+      friendshipStatus = friendRequest.getStatus()
+    }
+
+    return new UserProfileDto(
+      userToFind.getUuid(),
+      userToFind.getUsername(),
+      userToFind.getPicture(),
+      userToFind.getGender(),
+      userToFind.getCountry(),
+      userToFind.getDateOfBirth(),
+      friendshipStatus
+    );
   }
 
   async findOneByUuid(uuid: string): Promise<User | undefined> {

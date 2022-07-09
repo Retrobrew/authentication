@@ -1,5 +1,6 @@
 import { EntityRepository } from '@mikro-orm/mysql';
 import { User } from '../domain/entities/user.entity';
+import { BadRequestException } from '@nestjs/common';
 
 export class UserRepository extends EntityRepository<User> {
 
@@ -11,5 +12,31 @@ export class UserRepository extends EntityRepository<User> {
     return this.findOne({ email: email });
   }
 
+  public async findAllExceptUserAndAdmin(userId: string): Promise<Array<User>> {
+    const usersToExclude = [];
+
+    const user = await this.findOne({ uuid: userId }, { populate: true });
+    if (!user) {
+      throw new BadRequestException("Nope");
+    }
+
+    usersToExclude.push(user);
+
+    const admin = await this.findOne({ username: 'admin' });
+    if (!admin) {
+      console.log("Could not found admin")
+    } else {
+      usersToExclude.push(admin);
+    }
+    usersToExclude.push(user.getFriends())
+
+    const x = this.qb()
+      .select(['uuid', 'username', 'picture', 'country'])
+      .where({
+        $nin: usersToExclude,
+      });
+
+    return x.execute();
+  }
 
 }

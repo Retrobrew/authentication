@@ -1,7 +1,8 @@
-export class AuthorDto {
+export class UserDto {
   public readonly uuid: string;
   public readonly username: string;
   public readonly picture: string;
+  //doubi
 
   constructor(
     uuid: string,
