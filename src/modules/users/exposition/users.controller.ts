@@ -50,11 +50,7 @@ export class UsersController {
   findAll(
     @Request() request
   ): Promise<Array<FriendDto>> {
-    try {
-      return this.usersService.findAll(request.user['userId']);
-    }catch (error){
-      throw new InternalServerErrorException(error, "Something went wrong")
-    }
+    return this.usersService.findAll(request.user['userId']);
   }
 
   @Put(':uuid/email')
