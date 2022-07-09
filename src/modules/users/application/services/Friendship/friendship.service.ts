@@ -74,6 +74,7 @@ export class FriendshipService {
       })
     }
 
+
     if(!friendRequest) {
       throw new InternalServerErrorException("Could not find friend request")
     }

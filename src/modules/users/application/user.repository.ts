@@ -28,13 +28,17 @@ export class UserRepository extends EntityRepository<User> {
     } else {
       usersToExclude.push(admin);
     }
-    usersToExclude.push(user.getFriends())
+
+    if(user.getFriends().length > 0) {
+      usersToExclude.push(user.getFriends())
+    }
+
     const x = this.qb()
       .select(['uuid', 'username', 'picture', 'country'])
       .where({
         $nin: usersToExclude,
       });
-    Logger.debug(x.getFormattedQuery());
+
     return x.execute();
   }
 

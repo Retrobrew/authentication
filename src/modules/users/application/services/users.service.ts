@@ -1,4 +1,4 @@
-import { BadRequestException, ImATeapotException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../../domain/entities/user.entity';
 import { UserRegistrationDto } from '../dto/user/user-registration.dto';
@@ -48,12 +48,8 @@ export class UsersService {
   }
 
   async findAll(userId: string): Promise<Array<FriendDto>> {
-    let users;
-    try {
-      users = await this.userRepository.findAllExceptUserAndAdmin(userId);
-    }catch (error) {
-      throw new ImATeapotException(error.message)
-    }
+    const users = await this.userRepository.findAllExceptUserAndAdmin(userId);
+
     const friends: Array<FriendDto> = [];
 
     users.forEach((user: any) => {
