@@ -1,6 +1,6 @@
 import { EntityRepository } from '@mikro-orm/mysql';
 import { User } from '../domain/entities/user.entity';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 
 export class UserRepository extends EntityRepository<User> {
 
@@ -24,7 +24,7 @@ export class UserRepository extends EntityRepository<User> {
 
     const admin = await this.findOne({ username: 'admin' });
     if (!admin) {
-      console.log("Could not found admin")
+      Logger.warn('Could not find admin in: findAllExceptUserAndAdmin');
     } else {
       usersToExclude.push(admin);
     }
