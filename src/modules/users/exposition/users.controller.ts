@@ -19,7 +19,9 @@ import { ChangeEmailDto } from '../application/dto/user/change-email.dto';
 import { ChangeUsernameDto } from '../application/dto/user/change-username.dto';
 import { ChangePasswordDto } from '../application/dto/user/change-password.dto';
 import { AuthenticationService } from '../../authentication/authentication.service';
-import { FriendDto } from '../application/dto/user/friend.dto';
+import { FriendDto } from '../application/dto/friend/friend.dto';
+import { FindUserDto } from '../application/dto/user/find-user.dto';
+import { UserProfileDto } from '../application/dto/user/user-profile.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('users')
@@ -87,6 +89,18 @@ export class UsersController {
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string) {
     return this.usersService.findOneByUuid(uuid);
+  }
+
+  @Get(':uuid/profile')
+  @UseGuards(JwtAuthGuard)
+  getUserProfile(
+    @Param('uuid') uuid: string,
+    @Request() request
+  ): Promise<UserProfileDto> {
+    const userId = request.user['userId'];
+    const findUserDto = new FindUserDto(userId, uuid)
+
+    return this.usersService.getUserProfile(findUserDto);
   }
 
   @Delete(':uuid')

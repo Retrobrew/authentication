@@ -96,6 +96,14 @@ export class User {
     return this.picture;
   }
 
+  getGender(): string {
+    return this.sexe
+  }
+
+  getDateOfBirth(): Date {
+    return this.dateOfBirth;
+  }
+
   getPassword(): string {
     return this.credentials.getPassword();
   }

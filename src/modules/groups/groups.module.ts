@@ -7,10 +7,11 @@ import { GroupController } from './exposition/group.controller';
 import { GroupsMembership } from './domain/entities/groups-membership.entity';
 import { UsersService } from '../users/application/services/users.service';
 import { User } from '../users/domain/entities/user.entity';
+import { FriendRequest } from '../users/domain/entities/friend-request.entity';
 
 @Module({
   imports: [
-    MikroOrmModule.forFeature({ entities: [Groups, GroupsMembership, User] }),
+    MikroOrmModule.forFeature({ entities: [Groups, GroupsMembership, User, FriendRequest] }),
     UsersModule,
   ],
   controllers: [
