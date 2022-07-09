@@ -8,7 +8,7 @@ import { ChangePasswordDto } from '../dto/user/change-password.dto';
 import { Credentials } from '../../domain/entities/credentials.entity';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../user.repository';
-import { FriendDto } from '../dto/user/friend.dto';
+import { FriendDto } from '../dto/friend/friend.dto';
 import { FindUserDto } from '../dto/user/find-user.dto';
 import { FriendRequest } from '../../domain/entities/friend-request.entity';
 import { EntityRepository } from '@mikro-orm/mysql';

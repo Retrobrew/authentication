@@ -19,7 +19,7 @@ import { ChangeEmailDto } from '../application/dto/user/change-email.dto';
 import { ChangeUsernameDto } from '../application/dto/user/change-username.dto';
 import { ChangePasswordDto } from '../application/dto/user/change-password.dto';
 import { AuthenticationService } from '../../authentication/authentication.service';
-import { FriendDto } from '../application/dto/user/friend.dto';
+import { FriendDto } from '../application/dto/friend/friend.dto';
 import { FindUserDto } from '../application/dto/user/find-user.dto';
 import { UserProfileDto } from '../application/dto/user/user-profile.dto';
 

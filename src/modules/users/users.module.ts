@@ -18,6 +18,7 @@ import { UnfriendController } from './exposition/friendship/unfriend.controller'
 import { GroupsService } from '../groups/application/services/groups.service';
 import { Groups } from '../groups/domain/entities/groups.entity';
 import { GroupsMembership } from '../groups/domain/entities/groups-membership.entity';
+import { FriendRequestService } from './application/services/Friendship/friend-request.service';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { GroupsMembership } from '../groups/domain/entities/groups-membership.en
     RequestFriendshipService,
     AnswerFriendshipRequestService,
     FriendshipService,
-    GroupsService
+    GroupsService,
+    FriendRequestService
   ],
   exports: [ UsersService ] // Requis pour l'utiliser dans auth module
 })

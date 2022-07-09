@@ -72,7 +72,7 @@ export class RequestFriendshipService {
 
 
   private getSentFriendshipRequest(user: User, requestId: number): FriendRequest {
-    let friendshipRequest = user.getSentFriendRequests().getItems().find((request) => {
+    const friendshipRequest = user.getSentFriendRequests().getItems().find((request) => {
       return request.getId() == requestId;
     })
 
@@ -90,7 +90,7 @@ export class RequestFriendshipService {
 
   // Faire un service userProvider
   private async getUser(userUuid: string): Promise<User> {
-    let user = await this.userRepository.findOne({uuid: userUuid}, { populate: true })
+    const user = await this.userRepository.findOne({uuid: userUuid}, { populate: true })
 
     if (!user) {
       Logger.error(

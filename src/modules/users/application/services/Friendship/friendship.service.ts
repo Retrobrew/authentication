@@ -2,10 +2,11 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../../../domain/entities/user.entity';
 import { UserRepository } from '../../user.repository';
 import { EntityRepository } from '@mikro-orm/mysql';
-import { FriendDto } from '../../dto/user/friend.dto';
+import { FriendDto } from '../../dto/friend/friend.dto';
 import { BadRequestException, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { Friendship } from '../../../domain/entities/friendship.entity';
 import { FriendRequest } from '../../../domain/entities/friend-request.entity';
+import { FriendRequestStatus } from '../../../domain/friend-request-status';
 
 export class FriendshipService {
   constructor(
@@ -62,14 +63,14 @@ export class FriendshipService {
     let friendRequest = await this.friendRequestRepository.findOne({
       requester: user,
       recipient: friend,
-      status: "accepted"
+      status: FriendRequestStatus.ACCEPTED
     })
 
     if(!friendRequest) {
       friendRequest = await this.friendRequestRepository.findOne({
         requester: friend,
         recipient: user,
-        status: "accepted"
+        status: FriendRequestStatus.ACCEPTED
       })
     }
 
