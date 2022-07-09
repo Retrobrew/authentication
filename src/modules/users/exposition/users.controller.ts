@@ -10,7 +10,7 @@ import {
   UseGuards,
   UsePipes,
   Request,
-  ValidationPipe,
+  ValidationPipe, InternalServerErrorException,
 } from '@nestjs/common';
 import { UserRegistrationDto } from '../application/dto/user/user-registration.dto';
 import { UsersService } from '../application/services/users.service';
@@ -50,7 +50,11 @@ export class UsersController {
   findAll(
     @Request() request
   ): Promise<Array<FriendDto>> {
-    return this.usersService.findAll(request.user['userId']);
+    try {
+      return this.usersService.findAll(request.user['userId']);
+    }catch (error){
+      throw new InternalServerErrorException(error, "Something went wrong")
+    }
   }
 
   @Put(':uuid/email')
