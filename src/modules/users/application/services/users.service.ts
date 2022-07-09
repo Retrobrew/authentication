@@ -52,7 +52,7 @@ export class UsersService {
     try {
       users = await this.userRepository.findAllExceptUserAndAdmin(userId);
     }catch (error) {
-      throw new ImATeapotException("woups")
+      throw new ImATeapotException(error.message)
     }
     const friends: Array<FriendDto> = [];
 
