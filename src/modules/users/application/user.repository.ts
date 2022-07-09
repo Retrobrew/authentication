@@ -28,12 +28,12 @@ export class UserRepository extends EntityRepository<User> {
     } else {
       usersToExclude.push(admin);
     }
+    usersToExclude.push(user.getFriends())
 
     const x = this.qb()
       .select(['uuid', 'username', 'picture', 'country'])
       .where({
-        $nin: user.getFriends(),
-        $ne: [usersToExclude]
+        $nin: usersToExclude,
       });
 
     return x.execute();
