@@ -62,7 +62,7 @@ export class GroupsService {
     if(!user){
       throw new BadRequestException("User unknown");
     }
-    const group = await this.groupsRepository.findOne(deleteGroupDto.groupUuid);
+    const group = await this.groupsRepository.findOne(deleteGroupDto.groupUuid, {populate: true});
 
     if(group.getCreator() !== user) {
       throw new ForbiddenException("Operation denied");

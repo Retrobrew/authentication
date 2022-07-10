@@ -1,4 +1,4 @@
-import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import { Cascade, Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
 import { User } from '../../../users/domain/entities/user.entity';
 import { GroupsMembership } from './groups-membership.entity';
 
@@ -35,8 +35,15 @@ export class Groups {
   @ManyToOne(() => User)
   private readonly createdBy: User;
 
-  // @ts-ignore
-  @OneToMany(() => GroupsMembership, gm => gm.group, { nullable: true })
+  @OneToMany(
+    () => GroupsMembership,
+    // @ts-ignore
+    gm => gm.group,
+    {
+      nullable: true,
+      cascade: [Cascade.REMOVE]
+    },
+  )
   private members: Collection<GroupsMembership>;
 
   constructor(group: IGroups) {
