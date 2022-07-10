@@ -3,10 +3,10 @@ import { AppModule } from './modules/app.module';
 
 async function bootstrap() {
   const port = 3000;
-  const options = {
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug']
     //ici on pourra passer les en-tête cors
-  }
-  const app = await NestFactory.create(AppModule, options);
+  });
 
   // Va appliquer la stratégie JWT du guard sur toutes les routes de l'appli
   // const reflector = app.get( Reflector );

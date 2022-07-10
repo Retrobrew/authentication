@@ -88,7 +88,7 @@ export class UsersController {
 
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string) {
-    return this.usersService.findOneByUuid(uuid);
+    return this.usersService.findOne(uuid);
   }
 
   @Get(':uuid/profile')

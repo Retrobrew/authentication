@@ -6,6 +6,7 @@ export class UserProfileDto {
   public readonly country: string;
   public readonly dateOfBirth: Date;
   public readonly friendshipStatus?: string;
+  public readonly friendRequestId?: number;
 
   constructor(
     uuid: string,
@@ -14,7 +15,8 @@ export class UserProfileDto {
     sex: string,
     country: string,
     dateOfBirth: Date,
-    friendshipStatus?: string
+    friendshipStatus?: string,
+    friendRequestId?: number
   ) {
     this.uuid = uuid;
     this.username = username;
@@ -23,5 +25,6 @@ export class UserProfileDto {
     this.country = country;
     this.dateOfBirth = dateOfBirth;
     this.friendshipStatus = friendshipStatus;
+    this.friendRequestId = friendRequestId;
   }
 }

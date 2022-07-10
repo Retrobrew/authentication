@@ -17,7 +17,7 @@ export class FriendRequestController {
   requestFriendship(
     @Req() request: Request,
     @Param('uuid') uuid: string
-  ) {
+  ): Promise<number> {
     const userUuid = request.user["userId"]
     if(userUuid == uuid){
       throw new BadRequestException("Vous ne pouvez pas être ami avec vous-même, désolé.");

@@ -3,7 +3,7 @@ import { User } from '../../../domain/entities/user.entity';
 import { UserRepository } from '../../user.repository';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { FriendDto } from '../../dto/friend/friend.dto';
-import { BadRequestException, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { Friendship } from '../../../domain/entities/friendship.entity';
 import { FriendRequest } from '../../../domain/entities/friend-request.entity';
 import { FriendRequestStatus } from '../../../domain/friend-request-status';
@@ -74,8 +74,9 @@ export class FriendshipService {
       })
     }
 
+
     if(!friendRequest) {
-      throw new InternalServerErrorException("Could not find friend request")
+      throw new NotFoundException("Could not find friend request")
     }
 
     await this.friendRepository.removeAndFlush(friendship);
