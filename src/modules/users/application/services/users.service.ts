@@ -95,8 +95,10 @@ export class UsersService {
     );
 
     let friendshipStatus = null;
+    let friendRequestId = null;
     if(friendRequest) {
       friendshipStatus = friendRequest.getStatus()
+      friendRequestId = friendRequest.getId()
     }
 
     return new UserProfileDto(
@@ -106,13 +108,22 @@ export class UsersService {
       userToFind.getGender(),
       userToFind.getCountry(),
       userToFind.getDateOfBirth(),
-      friendshipStatus
+      friendshipStatus,
+      friendRequestId
     );
   }
 
   async findOneByUuid(uuid: string): Promise<User | undefined> {
     // @ts-ignore
     return await this.userRepository.findOne({ uuid: uuid }, { populate: ['friends.friendB.uuid'] });
+  }
+
+  async findOne(uuid: string): Promise<User | undefined> {
+    return await this.userRepository.findOne(
+      { uuid: uuid },
+      // @ts-ignore
+      { fields: ['uuid', 'username', 'dateOfBirth', 'picture', 'sexe', 'country']}
+    );
   }
 
   async findOneByEmail(email: string): Promise<User | undefined> {
