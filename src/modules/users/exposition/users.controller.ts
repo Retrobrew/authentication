@@ -10,7 +10,7 @@ import {
   UseGuards,
   UsePipes,
   Request,
-  ValidationPipe, InternalServerErrorException,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserRegistrationDto } from '../application/dto/user/user-registration.dto';
 import { UsersService } from '../application/services/users.service';
@@ -88,7 +88,7 @@ export class UsersController {
 
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string) {
-    return this.usersService.findOneByUuid(uuid);
+    return this.usersService.findOne(uuid);
   }
 
   @Get(':uuid/profile')
