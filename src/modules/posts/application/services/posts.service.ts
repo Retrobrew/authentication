@@ -74,7 +74,6 @@ export class PostsService {
   }
 
   async getUserPosts(userId: string): Promise<Array<FeedPostDto>> {
-
     const user: User = await this.userRepository.findOneByUuid(userId);
 
     if(!user) {
@@ -99,8 +98,28 @@ export class PostsService {
     return postsDto;
   }
 
-  async getPost(postId: string): Promise<Post> {
-    return this.postsRepository.findOne({ uuid: postId }, { populateWhere: ['author', 'postedIn'] });
+  async getPost(postId: string, userId: string): Promise<FeedPostDto> {
+    const user: User = await this.userRepository.findOneByUuid(userId);
+
+    if(!user) {
+      throw new BadRequestException("Utilisateur inconnu")
+    }
+
+    const post = await this.postsRepository.findOne(
+      { uuid: postId },
+      { fields: [
+          // @ts-ignore
+          'uuid', 'author', { author: ['uuid', 'username'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes',
+        ] }
+    );
+
+    if(!post) {
+      throw new NotFoundException("This post does not exists");
+    }
+
+    const likedByUser = post.getLikes().includes(user);
+
+    return FeedPostDto.createFromPost(post, likedByUser);
   }
 
   async likePost(postLikeDto: PostLikeDto): Promise<void> {

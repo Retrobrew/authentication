@@ -13,7 +13,6 @@ import { Request } from 'express';
 import { EditPostDto } from '../application/dto/post/edit-post/edit-post.dto';
 import { PostsService } from '../application/services/posts.service';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
-import { Post as UserPost } from '../domain/entities/post.entity';
 import { CreatePostDto } from '../application/dto/post/create-post/create-post.dto';
 import { EditPostRequestDto } from '../application/dto/post/edit-post/edit-post-request.dto';
 import { DeletePostDto } from '../application/dto/post/delete-post.dto';
@@ -102,8 +101,8 @@ export class PostsController {
   async getPost(
     @Param('uuid') postId: string,
     @Req() req: Request
-  ): Promise<UserPost> {
-    return this.postsService.getPost(postId);
+  ): Promise<FeedPostDto> {
+    return this.postsService.getPost(postId, req.user['userId']);
   }
 
   @Delete(":uuid")
