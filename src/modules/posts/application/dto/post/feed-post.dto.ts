@@ -1,5 +1,6 @@
 import { AuthorDto } from './author.dto';
 import { PostedInDto } from './posted-in.dto';
+import { Post } from '../../../domain/entities/post.entity';
 
 export class FeedPostDto {
   public readonly uuid: string;
@@ -35,5 +36,25 @@ export class FeedPostDto {
     this.postedIn = postedIn;
     this.likedByUser = likedByUser;
     this.likesNb = likesNb;
+  }
+
+  public static createFromPost(post: Post, likedByUser = false): FeedPostDto {
+    const authorDto = new AuthorDto(
+      post.getAuthor().getUuid(),
+      post.getAuthor().getUsername()
+    );
+    const groupDto = new PostedInDto(post.getPostedInGroup());
+    return new FeedPostDto(
+      post.getUuid(),
+      post.getTitle(),
+      post.getComments().length,
+      authorDto,
+      post.getContent(),
+      null,
+      post.getCreatedAt(),
+      groupDto,
+      likedByUser,
+      post.getLikes().length
+    );
   }
 }
