@@ -79,7 +79,7 @@ export class GroupsService {
     return await this.groupsRepository.findOne(
       { uuid: uuid },
       // @ts-ignore
-      { fields: ['uuid', 'name', 'isProject', 'createdBy', 'members', 'picture', 'description'] }
+      { fields: ['uuid', 'name', 'isProject', 'createdBy',{createdBy: ['uuid', 'username', 'picture']}, 'members', 'picture', 'description'] }
     );
   }
 
