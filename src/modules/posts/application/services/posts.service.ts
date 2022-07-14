@@ -8,11 +8,10 @@ import { PostRepository } from '../post.repository';
 import { User } from '../../../users/domain/entities/user.entity';
 import { DeletePostDto } from '../dto/post/delete-post.dto';
 import { FeedPostDto } from '../dto/post/feed-post.dto';
-import { AuthorDto } from '../dto/post/author.dto';
 import { Groups } from '../../../groups/domain/entities/groups.entity';
 import { GroupsService } from '../../../groups/application/services/groups.service';
-import { PostedInDto } from '../dto/post/posted-in.dto';
 import { PostLikeDto } from '../dto/post/post-like.dto';
+import { QueryOrder } from '@mikro-orm/core';
 
 export class PostsService {
   constructor(
@@ -74,15 +73,30 @@ export class PostsService {
     await this.postsRepository.persistAndFlush(post);
   }
 
-  async getUserPosts(userId: string): Promise<Array<Post>> {
+  async getUserPosts(userId: string): Promise<Array<FeedPostDto>> {
 
     const user: User = await this.userRepository.findOneByUuid(userId);
 
     if(!user) {
       throw new BadRequestException("Utilisateur inconnu")
     }
-
-    return this.postsRepository.find({ author: user })
+    const postsDto = [];
+    const posts = await this.postsRepository.find(
+      { author: user },
+      {
+        fields: [
+          // @ts-ignore
+          'uuid', 'author', { author: ['uuid', 'username'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes',
+        ],
+        // @ts-ignore
+        orderBy: { createdAt: QueryOrder.DESC }
+      }
+    )
+    posts.forEach((post: Post) => {
+      const likedByUser = post.getLikes().includes(user);
+      postsDto.push(FeedPostDto.createFromPost(post, likedByUser));
+    })
+    return postsDto;
   }
 
   async getPost(postId: string): Promise<Post> {
@@ -150,25 +164,8 @@ export class PostsService {
     const postsFeed: Array<FeedPostDto> = [];
 
     friendsPosts.forEach((post: Post) => {
-      const authorDto = new AuthorDto(
-        post.getAuthor().getUuid(),
-        post.getAuthor().getUsername()
-      );
-
-      const groupDto = new PostedInDto(post.getPostedInGroup());
-      const feedPost = new FeedPostDto(
-        post.getUuid(),
-        post.getTitle(),
-        post.getComments().length,
-        authorDto,
-        post.getContent(),
-        null,
-        post.getCreatedAt(),
-        groupDto,
-        post.getLikes().includes(user),
-        post.getLikes().length
-      );
-      postsFeed.push(feedPost);
+      const likedByUser = post.getLikes().includes(user);
+      postsFeed.push(FeedPostDto.createFromPost(post, likedByUser));
     })
 
     // @ts-ignore
@@ -182,27 +179,7 @@ export class PostsService {
     const feedPosts: Array<FeedPostDto> = [];
 
     posts.forEach((post: Post) => {
-      const authorDto = new AuthorDto(
-        post.getAuthor().getUuid(),
-        post.getAuthor().getUsername()
-      );
-
-      const groupDto = new PostedInDto(post.getPostedInGroup());
-
-      const feedPost = new FeedPostDto(
-        post.getUuid(),
-        post.getTitle(),
-        post.getComments().length,
-        authorDto,
-        post.getContent(),
-        null,
-        post.getCreatedAt(),
-        groupDto,
-        false,
-        post.getLikes().length
-      );
-      feedPosts.push(feedPost);
-
+      feedPosts.push(FeedPostDto.createFromPost(post, false));
     })
 
     return feedPosts;
@@ -214,24 +191,8 @@ export class PostsService {
     const feedPosts: Array<FeedPostDto> = [];
 
     posts.forEach((post: Post) => {
-      const authorDto = new AuthorDto(
-        post.getAuthor().getUuid(),
-        post.getAuthor().getUsername()
-      );
-
-      const feedPost = new FeedPostDto(
-        post.getUuid(),
-        post.getTitle(),
-        post.getComments().length,
-        authorDto,
-        post.getContent(),
-        null,
-        post.getCreatedAt(),
-        new PostedInDto(post.getPostedInGroup()),
-        post.getLikes().includes(user),
-        post.getLikes().length
-      );
-      feedPosts.push(feedPost);
+      const likedByUser = post.getLikes().includes(user);
+      feedPosts.push(FeedPostDto.createFromPost(post,likedByUser));
     })
 
     return feedPosts;

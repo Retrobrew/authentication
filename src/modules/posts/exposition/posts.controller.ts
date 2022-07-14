@@ -21,6 +21,7 @@ import { UuidDto } from '../application/dto/uuid.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { PostLikeDto } from '../application/dto/post/post-like.dto';
+import { FeedPostDto } from '../application/dto/post/feed-post.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
@@ -92,7 +93,7 @@ export class PostsController {
   @Get()
   async getPosts(
     @Req() req: Request
-  ) : Promise<Array<UserPost>> {
+  ) : Promise<Array<FeedPostDto>> {
     const user = req.user;
     return this.postsService.getUserPosts(user["userId"]);
   }
