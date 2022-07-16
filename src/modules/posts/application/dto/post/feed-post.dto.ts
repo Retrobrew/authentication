@@ -41,7 +41,8 @@ export class FeedPostDto {
   public static createFromPost(post: Post, likedByUser = false): FeedPostDto {
     const authorDto = new AuthorDto(
       post.getAuthor().getUuid(),
-      post.getAuthor().getUsername()
+      post.getAuthor().getUsername(),
+      post.getAuthor().getCountry()
     );
     const groupDto = new PostedInDto(post.getPostedInGroup());
     return new FeedPostDto(
