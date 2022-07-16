@@ -85,7 +85,7 @@ export class PostsService {
       {
         fields: [
           // @ts-ignore
-          'uuid', 'author', { author: ['uuid', 'username'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes',
+          'uuid', 'author', { author: ['uuid', 'username', 'picture', 'country'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes',
         ],
         // @ts-ignore
         orderBy: { createdAt: QueryOrder.DESC }
@@ -109,7 +109,7 @@ export class PostsService {
       { uuid: postId },
       { fields: [
           // @ts-ignore
-          'uuid', 'author', { author: ['uuid', 'username'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes',
+          'uuid', 'author', { author: ['uuid', 'username', 'picture', 'country'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes',
         ] }
     );
 

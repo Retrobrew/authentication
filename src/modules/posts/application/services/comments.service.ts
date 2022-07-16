@@ -19,8 +19,10 @@ export class CommentsService {
   async getPostComments(postUuid: string): Promise<Array<PostCommentsDto>> {
     const post = await this.postsRepository.findOne(
       { uuid: postUuid },
-      // @ts-ignore
-      { populate: ['comments']}
+      {
+        // @ts-ignore
+        fields: ['comments', { comments: ['uuid', 'title', 'content', 'author',{author: ['uuid', 'username','picture', 'country']}, 'lastUpdatedAt', 'media']}]
+      }
     );
 
     if(!post) {
@@ -33,7 +35,8 @@ export class CommentsService {
       .forEach((comment) => {
         const authorDto = new AuthorDto(
           comment.getAuthor().getUuid(),
-          comment.getAuthor().getUsername()
+          comment.getAuthor().getUsername(),
+          comment.getAuthor().getCountry()
         );
 
         const postComment = new PostCommentsDto(
