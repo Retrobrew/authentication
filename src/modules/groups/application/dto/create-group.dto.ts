@@ -8,26 +8,15 @@ export class CreateGroupDto {
 
   // @IsNotEmpty()
   // @Transform(({ value }: TransformFnParams) => value.trim())
-  picture: string;
+  icon: Buffer;
+
+  banner: Buffer;
 
   description: string;
 
   @IsNotEmpty()
-  isProject: boolean;
+  isProject: string;
 
   userUuid: string;
 
-  constructor(
-    name: string,
-    picture: string,
-    description: string,
-    isProject: boolean,
-    userUuid: string,
-  ) {
-    this.name = name;
-    this.picture = picture;
-    this.description = description;
-    this.isProject = isProject;
-    this.userUuid = userUuid;
-  }
 }

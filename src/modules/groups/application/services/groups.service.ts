@@ -34,10 +34,11 @@ export class GroupsService {
     const group = new Groups({
       uuid: randomUUID(),
       name: request.name,
-      picture: request.picture,
+      picture: 'icon.jpg',
+      banner: 'banner.jpg',
       createdAt: new Date(),
       description: request.description,
-      isProject: request.isProject,
+      isProject: request.isProject !== 'false',
       createdBy: user,
     });
 

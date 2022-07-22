@@ -6,6 +6,7 @@ export interface IGroups {
   uuid: string;
   name: string;
   picture: string;
+  banner: string;
   createdAt: Date;
   description: string;
   isProject: boolean;
@@ -22,6 +23,9 @@ export class Groups {
 
   @Property({ nullable: true })
   picture: string;
+
+  @Property({ nullable: true })
+  banner: string;
 
   @Property({ nullable: true })
   createdAt: Date;
@@ -50,6 +54,7 @@ export class Groups {
     this.uuid = group.uuid;
     this.name = group.name;
     this.picture = group.picture;
+    this.banner = group.banner;
     this.createdAt = group.createdAt;
     this.description = group.description;
     this.isProject = group.isProject;
