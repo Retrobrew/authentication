@@ -5,6 +5,7 @@ import { FriendshipService } from '../application/services/Friendship/friendship
 import { GroupsService } from '../../groups/application/services/groups.service';
 
 @UsePipes(new ValidationPipe({ transform: true }))
+@UseGuards(JwtAuthGuard)
 @Controller()
 export class UsersProfileController {
   constructor(
@@ -13,20 +14,17 @@ export class UsersProfileController {
     private readonly groupsService: GroupsService
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('profile')
   async profile(@Request() req) {
     return this.usersService.findOneByUuid(req.user['userId']);
   }
 
   @Get('my/friends')
-  @UseGuards(JwtAuthGuard)
   getMyFriends(@Request() req) {
     return this.friendshipService.getFriends(req.user['userId']);
   }
 
   @Get('my/groups')
-  @UseGuards(JwtAuthGuard)
   async getUserGroups(@Req() req) {
      return this.groupsService.getUserGroups(req.user['userId'])
   }
