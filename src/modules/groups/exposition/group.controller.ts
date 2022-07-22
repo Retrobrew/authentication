@@ -63,7 +63,7 @@ export class GroupController {
   @HttpCode(202)
   async create(
     @Body() createGroupDto: CreateGroupDto,
-    @UploadedFiles() files: {icon: Express.Multer.File, banner: Express.Multer.File},
+    @UploadedFiles() files: {icon?: Express.Multer.File, banner?: Express.Multer.File},
     @Req() req: Request
   ) {
     createGroupDto.userUuid= req.user['userId'];
@@ -73,17 +73,27 @@ export class GroupController {
       const groupStorage = `${process.env.GROUP_STORAGE}${group.getUuid()}`;
       if(!fs.existsSync(groupStorage)){
         fs.mkdirSync(groupStorage, { recursive: true })
+        fs.copyFile(`${process.cwd()}/assets/${group.picture}`, `${groupStorage}/${group.picture}`, (err) => {
+          console.log(err);
+        })
+        fs.copyFile(`${process.cwd()}/assets/${group.banner}`, `${groupStorage}/${group.banner}`, (err) => {
+          console.log(err);
+        })
       }
       const iconFile = groupStorage + '/' + group.picture;
       const bannerFile = groupStorage + '/' + group.banner;
 
-      fs.writeFile(iconFile, files.icon[0].buffer, function(err){
-        console.log(err);
-      });
+      if(files.icon) {
+        fs.writeFile(iconFile, files.icon[0].buffer, function(err){
+          console.log(err);
+        });
+      }
 
-      fs.writeFile(bannerFile ,files.banner[0].buffer, function(err){
-        console.log(err);
-      });
+      if(files.banner){
+        fs.writeFile(bannerFile ,files.banner[0].buffer, function(err){
+          console.log(err);
+        });
+      }
 
       return group;
     } catch (error) {
