@@ -46,9 +46,10 @@ export class UsersController {
     } catch (error) {
       throw new BadRequestException(error.message)
     }
+
     const userStorage = `${process.env.USER_STORAGE}${newUser.getUuid()}`;
     if(!fs.existsSync(userStorage)){
-      fs.mkdirSync(userStorage)
+      fs.mkdirSync(userStorage, { recursive: true })
     }
     const filename = userStorage + '/avatar.jpg';
 
