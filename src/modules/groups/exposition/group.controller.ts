@@ -7,7 +7,7 @@ import {
   HttpCode,
   Param,
   Post,
-  Put, Req, Res, UploadedFiles,
+  Put, Req, Res, UploadedFile, UploadedFiles,
   UseGuards, UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -21,9 +21,10 @@ import { Express, Request } from 'express';
 import { DeleteGroupDto } from '../application/dto/delete-group.dto';
 import { JoinGroupDto } from '../application/dto/join-group.dto';
 import { QuitGroupDto } from '../application/dto/quit-group.dto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { Observable, of } from 'rxjs';
+import { UploadFileDto } from '../application/dto/upload-file.dto';
+import { UploadIconDto } from '../application/dto/upload-icon.dto';
 
 @UsePipes(
   new ValidationPipe({
@@ -70,30 +71,14 @@ export class GroupController {
 
     try {
       const group = await this.groupsService.create(createGroupDto);
-      const groupStorage = `${process.env.GROUP_STORAGE}${group.getUuid()}`;
-      if(!fs.existsSync(groupStorage)){
-        fs.mkdirSync(groupStorage, { recursive: true })
-        fs.copyFile(`${process.cwd()}/assets/${group.picture}`, `${groupStorage}/${group.picture}`, (err) => {
-          console.log(err);
-        })
-        fs.copyFile(`${process.cwd()}/assets/${group.banner}`, `${groupStorage}/${group.banner}`, (err) => {
-          console.log(err);
-        })
-      }
-      const iconFile = groupStorage + '/' + group.picture;
-      const bannerFile = groupStorage + '/' + group.banner;
 
-      if(files.icon) {
-        fs.writeFile(iconFile, files.icon[0].buffer, function(err){
-          console.log(err);
-        });
-      }
-
-      if(files.banner){
-        fs.writeFile(bannerFile ,files.banner[0].buffer, function(err){
-          console.log(err);
-        });
-      }
+      await this.groupsService.uploadImagesOnGroupCreation(
+        new UploadFileDto(
+          group.uuid,
+          files.icon?files.icon[0].buffer:null,
+          files.banner?files.banner[0].buffer:null
+        )
+      );
 
       return group;
     } catch (error) {
@@ -159,6 +144,30 @@ export class GroupController {
 
     try {
       await this.groupsService.quit(dto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @Post(':groupUuid/icon')
+  @UseInterceptors(FileInterceptor('icon'))
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(202)
+  async uploadImage(
+    @Req() request: Request,
+    @Param('groupUuid') groupUuid: string,
+    @UploadedFile() icon: Express.Multer.File
+  ): Promise<void> {
+    const user = request.user['userId'];
+
+    try {
+      await this.groupsService.uploadImage(
+        new UploadIconDto(
+          groupUuid,
+          icon.buffer,
+          user
+        )
+      );
     } catch (error) {
       throw new BadRequestException(error.message);
     }

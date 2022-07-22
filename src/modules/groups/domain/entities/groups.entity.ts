@@ -15,6 +15,8 @@ export interface IGroups {
 
 @Entity()
 export class Groups {
+  public static readonly ICON_FILE_NAME = 'icon.jpg';
+  public static readonly BANNER_FILE_NAME = 'banner.jpg';
   @PrimaryKey()
   uuid: string;
 
