@@ -15,6 +15,8 @@ export class CreateGroupDto {
   @IsNotEmpty()
   isProject: boolean;
 
+  langage: string;
+
   userUuid: string;
 
   constructor(
@@ -22,12 +24,14 @@ export class CreateGroupDto {
     picture: string,
     description: string,
     isProject: boolean,
+    langage: string,
     userUuid: string,
   ) {
     this.name = name;
     this.picture = picture;
     this.description = description;
     this.isProject = isProject;
+    this.langage = langage;
     this.userUuid = userUuid;
   }
 }
