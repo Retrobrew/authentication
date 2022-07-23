@@ -17,6 +17,8 @@ export class CreateGroupDto {
   @IsNotEmpty()
   isProject: string;
 
+  langage: string;
+
   userUuid: string;
 
 }

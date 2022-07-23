@@ -11,6 +11,7 @@ export interface IGroups {
   description: string;
   isProject: boolean;
   createdBy: User;
+  langage: string;
 }
 
 @Entity()
@@ -38,6 +39,9 @@ export class Groups {
   @Property({ default: false })
   isProject: boolean;
 
+  @Property({ default: false })
+  langage: string;
+
   @ManyToOne(() => User)
   private readonly createdBy: User;
 
@@ -61,6 +65,7 @@ export class Groups {
     this.description = group.description;
     this.isProject = group.isProject;
     this.createdBy = group.createdBy;
+    this.langage = group.langage;
   }
 
   public getCreator(): User {
