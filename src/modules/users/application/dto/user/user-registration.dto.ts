@@ -31,4 +31,7 @@ export class UserRegistrationDto {
   @IsString()
   password: string;
 
+  readonly avatar: Buffer;
+
+
 }

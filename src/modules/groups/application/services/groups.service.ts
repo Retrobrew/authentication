@@ -1,6 +1,12 @@
 import { EntityRepository } from '@mikro-orm/mysql';
 import { InjectRepository } from '@mikro-orm/nestjs';
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Groups } from 'src/modules/groups/domain/entities/groups.entity';
 import { UsersService } from 'src/modules/users/application/services/users.service';
@@ -12,6 +18,9 @@ import { GroupsMembership } from '../../domain/entities/groups-membership.entity
 import { JoinGroupDto, RequestGroup } from '../dto/join-group.dto';
 import { QuitGroupDto } from '../dto/quit-group.dto';
 import { UserProfileGroupDto } from '../dto/user-profile-group.dto';
+import * as fs from 'fs';
+import { UploadFileDto } from '../dto/upload-file.dto';
+import { UploadIconDto } from '../dto/upload-icon.dto';
 
 export interface UserAndGroup {
   user: User;
@@ -34,11 +43,13 @@ export class GroupsService {
     const group = new Groups({
       uuid: randomUUID(),
       name: request.name,
-      picture: request.picture,
+      picture: Groups.ICON_FILE_NAME,
+      banner: Groups.BANNER_FILE_NAME,
       createdAt: new Date(),
       description: request.description,
-      isProject: request.isProject,
+      isProject: request.isProject !== 'false',
       createdBy: user,
+      language: request.language,
     });
 
     await this.groupsRepository.persistAndFlush(group);
@@ -79,7 +90,7 @@ export class GroupsService {
     return await this.groupsRepository.findOne(
       { uuid: uuid },
       // @ts-ignore
-      { fields: ['uuid', 'name', 'isProject', 'createdBy',{createdBy: ['uuid', 'username', 'picture']}, 'members', 'picture', 'description'] }
+      { fields: ['uuid', 'name', 'isProject', 'createdBy',{createdBy: ['uuid', 'username', 'picture']}, 'members', 'picture', 'description', 'language'] }
     );
   }
 
@@ -162,6 +173,64 @@ export class GroupsService {
     }
 
     await this.groupMembership.removeAndFlush(groupMembership);
+  }
+
+  async uploadImage(uploadFileDto: UploadIconDto) {
+    const result = await this._RequestValid({
+      groupUuid: uploadFileDto.groupUuid,
+      userUuid: uploadFileDto.userUuid,
+    });
+
+    const isMember = result.group.getMembers().includes(result.user);
+    const isCreator = result.group.getCreator().getUuid() == result.user.getUuid();
+    if(!isMember && !isCreator){
+      throw new UnauthorizedException("Operation not permitted. You need to be a member of this group")
+    }
+
+    const groupStorage = `${process.env.GROUP_STORAGE}${uploadFileDto.groupUuid}`;
+    const iconFile     = groupStorage + '/' + Groups.ICON_FILE_NAME;
+    this.writeFile(iconFile, uploadFileDto.file);
+  }
+
+  async uploadImagesOnGroupCreation(uploadFileDto: UploadFileDto) {
+    const groupStorage = `${process.env.GROUP_STORAGE}${uploadFileDto.groupUuid}`;
+    const iconFile     = groupStorage + '/' + Groups.ICON_FILE_NAME;
+    const bannerFile   = groupStorage + '/' + Groups.BANNER_FILE_NAME;
+
+    if(!fs.existsSync(groupStorage)){
+      fs.mkdirSync(groupStorage, { recursive: true })
+      this.copyFile(
+        `${process.cwd()}/assets/${Groups.ICON_FILE_NAME}`,
+        iconFile
+      );
+      this.copyFile(
+        `${process.cwd()}/assets/${Groups.BANNER_FILE_NAME}`,
+        bannerFile
+      )
+    }
+
+    if(uploadFileDto.icon) {
+      this.writeFile(iconFile, uploadFileDto.icon);
+    }
+
+    if(uploadFileDto.banner){
+      this.writeFile(bannerFile, uploadFileDto.banner);
+    }
+  }
+
+
+  private copyFile(path: string, dest: string) {
+    fs.copyFile(
+      path, dest,
+      (err) => {
+        console.log(err);
+      })
+  }
+
+  private writeFile(filepath: string, file: Buffer) {
+    fs.writeFile(filepath, file, function(err){
+      console.log(err);
+    });
   }
 
   private async _RequestValid(request: RequestGroup): Promise<UserAndGroup> {

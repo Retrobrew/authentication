@@ -12,6 +12,8 @@ import { Groups } from '../../../groups/domain/entities/groups.entity';
 import { GroupsService } from '../../../groups/application/services/groups.service';
 import { PostLikeDto } from '../dto/post/post-like.dto';
 import { QueryOrder } from '@mikro-orm/core';
+import * as fs from 'fs';
+
 
 export class PostsService {
   constructor(
@@ -40,6 +42,19 @@ export class PostsService {
       createPostDto.media,
       group
     );
+
+    if(createPostDto.media) {
+      const feedStorage = process.env.HOME_FEED_STORAGE;
+      const mediaPath = feedStorage + post.getMedia();
+
+      if(!fs.existsSync(feedStorage)) {
+        fs.mkdirSync(feedStorage, { recursive: true })
+      }
+      fs.writeFile(mediaPath, createPostDto.media, function(err){
+        console.log(err);
+      });
+    }
+
 
     await this.postsRepository.persistAndFlush(post);
 
@@ -98,26 +113,27 @@ export class PostsService {
     return postsDto;
   }
 
-  async getPost(postId: string, userId: string): Promise<FeedPostDto> {
-    const user: User = await this.userRepository.findOneByUuid(userId);
-
-    if(!user) {
-      throw new BadRequestException("Utilisateur inconnu")
-    }
-
+  async getPost(postId: string, userId?: string): Promise<FeedPostDto> {
     const post = await this.postsRepository.findOne(
       { uuid: postId },
       { fields: [
           // @ts-ignore
-          'uuid', 'author', { author: ['uuid', 'username', 'picture', 'country'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes',
+          'uuid', 'author', { author: ['uuid', 'username', 'picture', 'country'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes', 'media',
         ] }
     );
 
     if(!post) {
       throw new NotFoundException("This post does not exists");
     }
+    let likedByUser = false;
 
-    const likedByUser = post.getLikes().includes(user);
+    if(userId) {
+      const user: User = await this.userRepository.findOneByUuid(userId);
+      likedByUser = post.getLikes().includes(user);
+      if(!user) {
+        throw new NotFoundException("User not found");
+      }
+    }
 
     return FeedPostDto.createFromPost(post, likedByUser);
   }

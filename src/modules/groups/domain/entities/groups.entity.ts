@@ -6,14 +6,18 @@ export interface IGroups {
   uuid: string;
   name: string;
   picture: string;
+  banner: string;
   createdAt: Date;
   description: string;
   isProject: boolean;
   createdBy: User;
+  language: string;
 }
 
 @Entity()
 export class Groups {
+  public static readonly ICON_FILE_NAME = 'icon.jpg';
+  public static readonly BANNER_FILE_NAME = 'banner.jpg';
   @PrimaryKey()
   uuid: string;
 
@@ -24,6 +28,9 @@ export class Groups {
   picture: string;
 
   @Property({ nullable: true })
+  banner: string;
+
+  @Property({ nullable: true })
   createdAt: Date;
 
   @Property({ nullable: true })
@@ -31,6 +38,9 @@ export class Groups {
 
   @Property({ default: false })
   isProject: boolean;
+
+  @Property({ default: false })
+  language: string;
 
   @ManyToOne(() => User)
   private readonly createdBy: User;
@@ -50,10 +60,12 @@ export class Groups {
     this.uuid = group.uuid;
     this.name = group.name;
     this.picture = group.picture;
+    this.banner = group.banner;
     this.createdAt = group.createdAt;
     this.description = group.description;
     this.isProject = group.isProject;
     this.createdBy = group.createdBy;
+    this.language = group.language;
   }
 
   public getCreator(): User {

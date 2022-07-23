@@ -10,7 +10,7 @@ import {
   UseGuards,
   UsePipes,
   Request,
-  ValidationPipe,
+  ValidationPipe, Res, UseInterceptors, UploadedFile,
 } from '@nestjs/common';
 import { UserRegistrationDto } from '../application/dto/user/user-registration.dto';
 import { UsersService } from '../application/services/users.service';
@@ -22,6 +22,9 @@ import { AuthenticationService } from '../../authentication/authentication.servi
 import { FriendDto } from '../application/dto/friend/friend.dto';
 import { FindUserDto } from '../application/dto/user/find-user.dto';
 import { UserProfileDto } from '../application/dto/user/user-profile.dto';
+import { Observable, of } from 'rxjs';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('users')
@@ -32,8 +35,10 @@ export class UsersController {
   ) {}
 
   @Post()
-  async registration(
-    @Body() createUserDto: UserRegistrationDto
+  @UseInterceptors(FileInterceptor('avatar'))
+  async registration (
+    @Body() createUserDto: UserRegistrationDto,
+    @UploadedFile() avatar: Express.Multer.File
   ) {
     let newUser;
     try {
@@ -42,6 +47,15 @@ export class UsersController {
       throw new BadRequestException(error.message)
     }
 
+    const userStorage = `${process.env.USER_STORAGE}${newUser.getUuid()}`;
+    if(!fs.existsSync(userStorage)){
+      fs.mkdirSync(userStorage, { recursive: true })
+    }
+    const filename = userStorage + '/avatar.jpg';
+
+    fs.writeFile(filename,avatar.buffer, function(err){
+      console.log(err);
+    });
     return await this.authService.login({ uuid: newUser.getUuid(), email: newUser.getEmail() });
   }
 
@@ -110,5 +124,14 @@ export class UsersController {
       this.usersService.remove(user);
     });
 
+  }
+
+  @Get(':uuid/avatar')
+  async getAvatar(@Param('uuid') uuid: string, @Res() res): Promise<Observable<Object>> {
+    return of(
+      res.sendFile(
+        `${process.cwd()}/${process.env.USER_STORAGE}${uuid}/avatar.jpg`
+      )
+    )
   }
 }
