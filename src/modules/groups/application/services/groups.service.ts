@@ -49,7 +49,7 @@ export class GroupsService {
       description: request.description,
       isProject: request.isProject !== 'false',
       createdBy: user,
-      langage: request.langage,
+      language: request.language,
     });
 
     await this.groupsRepository.persistAndFlush(group);
@@ -90,7 +90,7 @@ export class GroupsService {
     return await this.groupsRepository.findOne(
       { uuid: uuid },
       // @ts-ignore
-      { fields: ['uuid', 'name', 'isProject', 'createdBy',{createdBy: ['uuid', 'username', 'picture']}, 'members', 'picture', 'description', 'langage'] }
+      { fields: ['uuid', 'name', 'isProject', 'createdBy',{createdBy: ['uuid', 'username', 'picture']}, 'members', 'picture', 'description', 'language'] }
     );
   }
 
