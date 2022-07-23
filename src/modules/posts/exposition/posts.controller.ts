@@ -3,7 +3,7 @@ import {
   Controller, Delete, Get, Param,
   Post,
   Put,
-  Req, UploadedFile,
+  Req, Res, UploadedFile,
   UseGuards, UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -21,10 +21,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { PostLikeDto } from '../application/dto/post/post-like.dto';
 import { FeedPostDto } from '../application/dto/post/feed-post.dto';
+import { Observable, of } from 'rxjs';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
-@UseGuards(JwtAuthGuard)
 export class PostsController {
   constructor(
     private readonly postsService: PostsService
@@ -32,6 +32,7 @@ export class PostsController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('media'))
   async createPost(
     @Body() createPostRequest: CreatePostRequestDto,
@@ -51,6 +52,7 @@ export class PostsController {
   }
 
   @Put(":uuid/like")
+  @UseGuards(JwtAuthGuard)
   async likePost(
     @Req() req: Request,
     @Param('uuid') post: string,
@@ -62,6 +64,7 @@ export class PostsController {
   }
 
   @Put(":uuid/unlike")
+  @UseGuards(JwtAuthGuard)
   async unlikePost(
     @Req() req: Request,
     @Param('uuid') post: string,
@@ -73,6 +76,7 @@ export class PostsController {
   }
 
   @Put(":uuid")
+  @UseGuards(JwtAuthGuard)
   async editPost(
     @Body() editPostRequest: EditPostRequestDto,
     @Req() req: Request,
@@ -90,6 +94,7 @@ export class PostsController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   async getPosts(
     @Req() req: Request
   ) : Promise<Array<FeedPostDto>> {
@@ -102,10 +107,11 @@ export class PostsController {
     @Param('uuid') postId: string,
     @Req() req: Request
   ): Promise<FeedPostDto> {
-    return this.postsService.getPost(postId, req.user['userId']);
+    return this.postsService.getPost(postId, req.user? req.user['userId']:null);
   }
 
   @Delete(":uuid")
+  @UseGuards(JwtAuthGuard)
   async deletePost(
     @Param('uuid') uuid: string,
     @Req() req: Request
@@ -116,6 +122,16 @@ export class PostsController {
     );
 
     return this.postsService.deletePost(deletePostDto);
+  }
+
+  @Get(':uuid/media')
+  async getAvatar(@Param('uuid') uuid: string, @Res() res): Promise<Observable<Object>> {
+    const post = await this.postsService.getPost(uuid);
+    return of(
+      res.sendFile(
+        `${process.cwd()}/${process.env.HOME_FEED_STORAGE}${post.media}`
+      )
+    )
   }
 
 
