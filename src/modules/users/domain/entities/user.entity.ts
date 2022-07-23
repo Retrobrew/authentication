@@ -66,6 +66,7 @@ export class User {
     this.dateOfBirth = dateOfBirth;
     this.sexe = sexe;
     this.country = country;
+    this.picture = 'avatar.jpg'
   }
 
   getUuid(): string {

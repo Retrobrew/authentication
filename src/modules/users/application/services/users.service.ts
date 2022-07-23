@@ -13,6 +13,8 @@ import { FindUserDto } from '../dto/user/find-user.dto';
 import { FriendRequest } from '../../domain/entities/friend-request.entity';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { UserProfileDto } from '../dto/user/user-profile.dto';
+import { ChangeAvatarDto } from '../dto/user/change-avatar.dto';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -86,19 +88,29 @@ export class UsersService {
       throw new NotFoundException("User not found");
     }
 
-    const friendRequest: FriendRequest = await this.friendRequestRepository.findOne(
+    const sentFriendRequest: FriendRequest = await this.friendRequestRepository.findOne(
       {
         // @ts-ignore
         requester: connectedUser,
         recipient: userToFind
       }
     );
+    const receivedFriendRequest: FriendRequest = await this.friendRequestRepository.findOne(
+      {
+        // @ts-ignore
+        requester: userToFind,
+        recipient: connectedUser
+      }
+    );
 
     let friendshipStatus = null;
     let friendRequestId = null;
-    if(friendRequest) {
-      friendshipStatus = friendRequest.getStatus()
-      friendRequestId = friendRequest.getId()
+    if(sentFriendRequest) {
+      friendshipStatus = sentFriendRequest.getStatus()
+      friendRequestId = sentFriendRequest.getId()
+    } else if(receivedFriendRequest) {
+      friendshipStatus = receivedFriendRequest.getStatus()
+      friendRequestId = receivedFriendRequest.getId()
     }
 
     return new UserProfileDto(
@@ -115,7 +127,14 @@ export class UsersService {
 
   async findOneByUuid(uuid: string): Promise<User | undefined> {
     // @ts-ignore
-    return await this.userRepository.findOne({ uuid: uuid }, { populate: ['friends.friendB.uuid'] });
+    return await this.userRepository.findOne(
+      { uuid: uuid },
+      {
+        // @ts-ignore
+        fields: ['uuid', 'username', 'dateOfBirth', 'picture', 'sexe', 'country', 'friends', 'email'],
+        // @ts-ignore
+        populate: ['friends.friendB.uuid']
+      });
   }
 
   async findOne(uuid: string): Promise<User | undefined> {
@@ -168,6 +187,23 @@ export class UsersService {
     await user.changePassword(hashedPassword);
 
     await this.userRepository.persistAndFlush(user);
+  }
+
+  async changeAvatar(changeAvatarDto: ChangeAvatarDto) {
+    const user = await this.findOneByUuid(changeAvatarDto.userUuid);
+    if(!user) {throw new NotFoundException("User not found")}
+
+    const userStorage = `${process.env.USER_STORAGE}${user.getUuid()}`;
+
+    if(!fs.existsSync(userStorage)){
+      fs.mkdirSync(userStorage, { recursive: true })
+    }
+    const filename = userStorage + '/avatar.jpg';
+
+    fs.writeFile(filename,changeAvatarDto.file, function(err){
+      console.log(err);
+    });
+
   }
 
 }

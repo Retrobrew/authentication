@@ -29,6 +29,7 @@ export class PostRepository extends EntityRepository<Post> {
           'postedIn', { postedIn: ['uuid', 'name'] },
           'comments', { comments: ['uuid', 'title'] },
           'likes',
+          'media'
         ],
         orderBy: { createdAt: QueryOrder.DESC }
       }
@@ -42,7 +43,7 @@ export class PostRepository extends EntityRepository<Post> {
         limit: 10,
         fields: [
           // @ts-ignore
-          'uuid', 'title', 'comments', { comments: ['uuid', 'title']}, 'author', { author: ['uuid', 'username', 'picture', 'country']}, 'createdAt', 'content', 'postedIn', { postedIn: ['uuid', 'name']}, 'likes'
+          'uuid', 'title', 'comments', { comments: ['uuid', 'title']}, 'author', { author: ['uuid', 'username', 'picture', 'country']}, 'createdAt', 'content', 'postedIn', { postedIn: ['uuid', 'name']}, 'likes', 'media'
           // @ts-ignore
         ], orderBy: { createdAt: QueryOrder.DESC }
       })
@@ -55,7 +56,7 @@ export class PostRepository extends EntityRepository<Post> {
         limit: 10,
         fields: [
           // @ts-ignore
-          'uuid', 'title', 'comments','author', 'createdAt', 'content', 'postedIn', { author: ['uuid', 'username', 'picture', 'country']}, { comments: ['uuid']}, { postedIn: ['uuid', 'name']}, 'likes'
+          'uuid', 'title', 'comments','author', 'createdAt', 'content', 'postedIn', { author: ['uuid', 'username', 'picture', 'country']}, { comments: ['uuid']}, { postedIn: ['uuid', 'name']}, 'likes', 'media'
         ],
         // @ts-ignore
         orderBy: {createdAt: QueryOrder.DESC}

@@ -65,7 +65,7 @@ export class Post {
     title: string,
     content: string,
     createdAt: Date,
-    media: Buffer,
+    media: Buffer = null,
     postedIn: Groups
   ): Post {
     const post =  new Post(
@@ -77,7 +77,7 @@ export class Post {
       post.title = title;
     }
     if(media){
-      post.media = "todo";
+      post.media = randomUUID() + '.jpg';
     }
 
     if(postedIn){
@@ -154,7 +154,7 @@ export class Post {
   }
 
   getMedia(): string {
-    return "";
+    return this.media;
   }
 
   getLikes(): Array<User> {

@@ -19,7 +19,6 @@ import { PostCommentsDto } from '../application/dto/comment/read-comments/post-c
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('posts')
-@UseGuards(JwtAuthGuard)
 export class CommentsController {
   constructor(
     private readonly commentsService: CommentsService
@@ -34,6 +33,7 @@ export class CommentsController {
   }
 
   @Post(":uuid/comment")
+  @UseGuards(JwtAuthGuard)
   async commentPost(
     @Body() commentPostRequest: CommentPostRequestDto,
     @Param('uuid') postId: string,
@@ -52,6 +52,7 @@ export class CommentsController {
   }
 
   @Put(":postId/comment/:uuid")
+  @UseGuards(JwtAuthGuard)
   async editComment(
     @Body() editCommentRequest: EditCommentRequestDto,
     @Param('uuid') comment: string,
@@ -68,6 +69,7 @@ export class CommentsController {
   }
 
   @Delete(":postId/comment/:uuid")
+  @UseGuards(JwtAuthGuard)
   async deleteComment(
     @Param('uuid') comment: string,
     @Req() req: Request
