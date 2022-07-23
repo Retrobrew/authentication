@@ -1,8 +1,22 @@
 import { UsersService } from '../application/services/users.service';
-import { Controller, Get, Req, Request, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get, HttpCode,
+  Post,
+  Req,
+  Request, UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../../authentication/jwt-auth-guard';
 import { FriendshipService } from '../application/services/Friendship/friendship.service';
 import { GroupsService } from '../../groups/application/services/groups.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
+import { ChangeAvatarDto } from '../application/dto/user/change-avatar.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @UseGuards(JwtAuthGuard)
@@ -27,6 +41,27 @@ export class UsersProfileController {
   @Get('my/groups')
   async getUserGroups(@Req() req) {
      return this.groupsService.getUserGroups(req.user['userId'])
+  }
+
+  @Post('my/avatar')
+  @UseInterceptors(FileInterceptor('avatar'))
+  @HttpCode(202)
+  async uploadIcon(
+    @Req() request,
+    @UploadedFile() avatar: Express.Multer.File
+  ): Promise<void> {
+    const user = request.user['userId'];
+
+    try {
+      await this.usersService.changeAvatar(
+        new ChangeAvatarDto(
+          user,
+          avatar.buffer
+        )
+      );
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
 }

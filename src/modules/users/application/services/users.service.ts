@@ -13,6 +13,8 @@ import { FindUserDto } from '../dto/user/find-user.dto';
 import { FriendRequest } from '../../domain/entities/friend-request.entity';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { UserProfileDto } from '../dto/user/user-profile.dto';
+import { ChangeAvatarDto } from '../dto/user/change-avatar.dto';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -185,6 +187,23 @@ export class UsersService {
     await user.changePassword(hashedPassword);
 
     await this.userRepository.persistAndFlush(user);
+  }
+
+  async changeAvatar(changeAvatarDto: ChangeAvatarDto) {
+    const user = await this.findOneByUuid(changeAvatarDto.userUuid);
+    if(!user) {throw new NotFoundException("User not found")}
+
+    const userStorage = `${process.env.USER_STORAGE}${user.getUuid()}`;
+
+    if(!fs.existsSync(userStorage)){
+      fs.mkdirSync(userStorage, { recursive: true })
+    }
+    const filename = userStorage + '/avatar.jpg';
+
+    fs.writeFile(filename,changeAvatarDto.file, function(err){
+      console.log(err);
+    });
+
   }
 
 }

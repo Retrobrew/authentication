@@ -37,11 +37,6 @@ export class GroupsService {
     private readonly userService: UsersService
   ) {}
 
-  public static ALLOWED_UPLOAD_TYPE = [
-    'icon',
-    'banner'
-  ];
-
   async create(request: CreateGroupDto): Promise<Groups> {
     const user = await this.userService.findOneByUuid(request.userUuid);
 

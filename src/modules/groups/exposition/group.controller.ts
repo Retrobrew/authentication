@@ -153,7 +153,7 @@ export class GroupController {
   @UseInterceptors(FileInterceptor('icon'))
   @UseGuards(JwtAuthGuard)
   @HttpCode(202)
-  async uploadImage(
+  async uploadIcon(
     @Req() request: Request,
     @Param('groupUuid') groupUuid: string,
     @UploadedFile() icon: Express.Multer.File
