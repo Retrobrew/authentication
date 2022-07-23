@@ -8,7 +8,7 @@ export class FeedPostDto {
   public readonly commentsNb: number;
   public readonly author: AuthorDto;
   public readonly content: string;
-  public readonly media: Buffer;
+  public readonly media: string;
   public readonly createdAt: Date;
   public readonly postedIn: PostedInDto;
   public readonly likedByUser: boolean;
@@ -20,7 +20,7 @@ export class FeedPostDto {
     commentsNb: number,
     author: AuthorDto,
     content: string,
-    media: Buffer,
+    media: string,
     createdAt: Date,
     postedIn: PostedInDto = null,
     likedByUser: boolean,
@@ -51,7 +51,7 @@ export class FeedPostDto {
       post.getComments().length,
       authorDto,
       post.getContent(),
-      null,
+      post.getMedia(),
       post.getCreatedAt(),
       groupDto,
       likedByUser,

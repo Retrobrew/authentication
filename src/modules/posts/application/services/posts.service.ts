@@ -12,7 +12,8 @@ import { Groups } from '../../../groups/domain/entities/groups.entity';
 import { GroupsService } from '../../../groups/application/services/groups.service';
 import { PostLikeDto } from '../dto/post/post-like.dto';
 import { QueryOrder } from '@mikro-orm/core';
-import fs from 'fs';
+import * as fs from 'fs';
+
 
 export class PostsService {
   constructor(
@@ -117,7 +118,7 @@ export class PostsService {
       { uuid: postId },
       { fields: [
           // @ts-ignore
-          'uuid', 'author', { author: ['uuid', 'username', 'picture', 'country'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes',
+          'uuid', 'author', { author: ['uuid', 'username', 'picture', 'country'] }, 'title', 'content', 'createdAt', 'parent', 'postedIn', { postedIn: ['uuid', 'name'] }, 'comments', { comments: ['uuid', 'title'] }, 'likes', 'media',
         ] }
     );
 

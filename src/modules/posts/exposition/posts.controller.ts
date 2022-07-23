@@ -125,7 +125,7 @@ export class PostsController {
   }
 
   @Get(':uuid/media')
-  async getAvatar(@Param('uuid') uuid: string, @Res() res): Promise<Observable<Object>> {
+  async getMedia(@Param('uuid') uuid: string, @Res() res): Promise<Observable<Object>> {
     const post = await this.postsService.getPost(uuid);
     return of(
       res.sendFile(
