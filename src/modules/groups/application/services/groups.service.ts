@@ -200,11 +200,11 @@ export class GroupsService {
     if(!fs.existsSync(groupStorage)){
       fs.mkdirSync(groupStorage, { recursive: true })
       this.copyFile(
-        `${process.cwd()}/assets/${Groups.ICON_FILE_NAME}`,
+        `${process.cwd()}/src/assets/${Groups.ICON_FILE_NAME}`,
         iconFile
       );
       this.copyFile(
-        `${process.cwd()}/assets/${Groups.BANNER_FILE_NAME}`,
+        `${process.cwd()}/src/assets/${Groups.BANNER_FILE_NAME}`,
         bannerFile
       )
     }
