@@ -177,7 +177,7 @@ export class GroupController {
   async getIcon(@Param('groupUuid') uuid: string, @Res() res): Promise<Observable<Object>> {
     return of(
       res.sendFile(
-        `${process.cwd()}/${process.env.GROUP_STORAGE}${uuid}/icon.jpg`
+        `${process.cwd()}/${process.env.GROUP_STORAGE}${uuid}/${Groups.ICON_FILE_NAME}`
       )
     )
   }
@@ -186,7 +186,7 @@ export class GroupController {
   async getBanner(@Param('groupUuid') uuid: string, @Res() res): Promise<Observable<Object>> {
     return of(
       res.sendFile(
-        `${process.cwd()}/${process.env.GROUP_STORAGE}${uuid}/banner.jpg`
+        `${process.cwd()}/${process.env.GROUP_STORAGE}${uuid}/${Groups.BANNER_FILE_NAME}`
       )
     )
   }

@@ -24,7 +24,6 @@ import { FindUserDto } from '../application/dto/user/find-user.dto';
 import { UserProfileDto } from '../application/dto/user/user-profile.dto';
 import { Observable, of } from 'rxjs';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('users')
@@ -38,7 +37,7 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('avatar'))
   async registration (
     @Body() createUserDto: UserRegistrationDto,
-    @UploadedFile() avatar: Express.Multer.File
+    @UploadedFile() avatar?: Express.Multer.File
   ) {
     let newUser;
     try {
@@ -47,15 +46,6 @@ export class UsersController {
       throw new BadRequestException(error.message)
     }
 
-    const userStorage = `${process.env.USER_STORAGE}${newUser.getUuid()}`;
-    if(!fs.existsSync(userStorage)){
-      fs.mkdirSync(userStorage, { recursive: true })
-    }
-    const filename = userStorage + '/avatar.jpg';
-
-    fs.writeFile(filename,avatar.buffer, function(err){
-      console.log(err);
-    });
     return await this.authService.login({ uuid: newUser.getUuid(), email: newUser.getEmail() });
   }
 

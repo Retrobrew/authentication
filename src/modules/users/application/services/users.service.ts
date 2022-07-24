@@ -35,7 +35,7 @@ export class UsersService {
     const password = bcrypt.hash(registrationDto.password, await salt);
     const dateOfBirth = new Date(registrationDto.dateOfBirth);
     const credentials = new Credentials(await password, await salt);
-    const user = new User(
+    newUser = new User(
       registrationDto.email,
       registrationDto.username,
       dateOfBirth,
@@ -44,9 +44,25 @@ export class UsersService {
       credentials
     );
 
-    await this.userRepository.persistAndFlush(user);
+    await this.userRepository.persistAndFlush(newUser);
 
-    return user;
+    const userStorage = `${process.env.USER_STORAGE}${newUser.getUuid()}`;
+    const filename = userStorage + '/avatar.jpg';
+    if(!fs.existsSync(userStorage)){
+      fs.mkdirSync(userStorage, { recursive: true })
+    }
+
+    if(registrationDto.avatar){
+      this.writeFile(filename, registrationDto.avatar)
+    } else {
+      const avatarPlaceholder = userStorage + '/' + User.AVATAR_FILE_NAME;
+      this.copyFile(
+        `${process.cwd()}/src/assets/${User.AVATAR_FILE_NAME}`,
+        avatarPlaceholder
+      );
+    }
+
+    return newUser;
   }
 
   async findAll(userId: string): Promise<Array<FriendDto>> {
@@ -198,12 +214,24 @@ export class UsersService {
     if(!fs.existsSync(userStorage)){
       fs.mkdirSync(userStorage, { recursive: true })
     }
-    const filename = userStorage + '/avatar.jpg';
+    const filename = userStorage + '/' + User.AVATAR_FILE_NAME;
 
-    fs.writeFile(filename,changeAvatarDto.file, function(err){
+    this.writeFile(filename, changeAvatarDto.file)
+
+  }
+
+  private copyFile(path: string, dest: string) {
+    fs.copyFile(
+      path, dest,
+      (err) => {
+        console.log(err);
+      })
+  }
+
+  private writeFile(filepath: string, file: Buffer) {
+    fs.writeFile(filepath, file, function(err){
       console.log(err);
     });
-
   }
 
 }
