@@ -9,6 +9,8 @@ import { Post } from '../../../posts/domain/entities/post.entity';
 @Entity({ customRepository: () => UserRepository })
 export class User {
 
+  public static readonly AVATAR_FILE_NAME = 'avatar.jpg';
+
   @PrimaryKey()
   private uuid: string;
 
@@ -66,7 +68,7 @@ export class User {
     this.dateOfBirth = dateOfBirth;
     this.sexe = sexe;
     this.country = country;
-    this.picture = 'avatar.jpg'
+    this.picture = User.AVATAR_FILE_NAME;
   }
 
   getUuid(): string {
