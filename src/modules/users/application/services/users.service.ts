@@ -35,7 +35,7 @@ export class UsersService {
     const password = bcrypt.hash(registrationDto.password, await salt);
     const dateOfBirth = new Date(registrationDto.dateOfBirth);
     const credentials = new Credentials(await password, await salt);
-    const user = new User(
+    newUser = new User(
       registrationDto.email,
       registrationDto.username,
       dateOfBirth,
@@ -44,7 +44,7 @@ export class UsersService {
       credentials
     );
 
-    await this.userRepository.persistAndFlush(user);
+    await this.userRepository.persistAndFlush(newUser);
 
     const userStorage = `${process.env.USER_STORAGE}${newUser.getUuid()}`;
     const filename = userStorage + '/avatar.jpg';
@@ -55,14 +55,14 @@ export class UsersService {
     if(registrationDto.avatar){
       this.writeFile(filename, registrationDto.avatar)
     } else {
-      const avatarPlaceholder     = userStorage + '/' + User.AVATAR_FILE_NAME;
+      const avatarPlaceholder = userStorage + '/' + User.AVATAR_FILE_NAME;
       this.copyFile(
         `${process.cwd()}/src/assets/${User.AVATAR_FILE_NAME}`,
         avatarPlaceholder
       );
     }
 
-    return user;
+    return newUser;
   }
 
   async findAll(userId: string): Promise<Array<FriendDto>> {
