@@ -40,7 +40,7 @@ export class PostRepository extends EntityRepository<Post> {
     return await this.find(
       { parent: null },
       {
-        limit: 10,
+        //limit: 10,
         fields: [
           // @ts-ignore
           'uuid', 'title', 'comments', { comments: ['uuid', 'title']}, 'author', { author: ['uuid', 'username', 'picture', 'country']}, 'createdAt', 'content', 'postedIn', { postedIn: ['uuid', 'name']}, 'likes', 'media'
@@ -53,7 +53,7 @@ export class PostRepository extends EntityRepository<Post> {
     return this.find(
       {postedIn: group, parent: null},
       {
-        limit: 10,
+        //limit: 10,
         fields: [
           // @ts-ignore
           'uuid', 'title', 'comments','author', 'createdAt', 'content', 'postedIn', { author: ['uuid', 'username', 'picture', 'country']}, { comments: ['uuid']}, { postedIn: ['uuid', 'name']}, 'likes', 'media'
