@@ -24,13 +24,17 @@ import { FindUserDto } from '../application/dto/user/find-user.dto';
 import { UserProfileDto } from '../application/dto/user/user-profile.dto';
 import { Observable, of } from 'rxjs';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FriendshipService } from '../application/services/Friendship/friendship.service';
+import { GroupsService } from '../../groups/application/services/groups.service';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly authService: AuthenticationService
+    private readonly friendshipService: FriendshipService,
+    private readonly authService: AuthenticationService,
+    private readonly groupsService: GroupsService
   ) {}
 
   @Post()
@@ -105,6 +109,19 @@ export class UsersController {
     const findUserDto = new FindUserDto(userId, uuid)
 
     return this.usersService.getUserProfile(findUserDto);
+  }
+  @Get(':uuid/friends')
+  @UseGuards(JwtAuthGuard)
+  getUserFriends(
+    @Param('uuid') uuid: string,
+  ): Promise<FriendDto[]> {
+    return this.friendshipService.getFriends(uuid);
+  }
+
+  @Get(':uuid/groups')
+  @UseGuards(JwtAuthGuard)
+  getUserGroups(@Param('uuid') uuid: string) {
+    return this.groupsService.getUserGroups(uuid);
   }
 
   @Delete(':uuid')
