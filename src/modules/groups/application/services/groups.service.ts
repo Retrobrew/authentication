@@ -83,7 +83,9 @@ export class GroupsService {
   }
 
   async findAll(): Promise<Groups[]> {
-    return await this.groupsRepository.findAll();
+    return await this.groupsRepository.find({
+      uuid : { $ne: 'home' }
+    });
   }
 
   async find(uuid: string): Promise<Groups> {
