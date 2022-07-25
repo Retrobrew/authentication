@@ -108,7 +108,7 @@ export class GroupsService {
     const groups: Array<UserProfileGroupDto> = [];
 
     const groupAsMember: Array<GroupsMembership> = await this.groupMembership.find(
-      { user: user },
+      { user: user, },
       { fields: [
           // @ts-ignore
           'id', 'group', { group: ['name', 'uuid', 'createdBy', {createdBy: ['uuid']}] }
@@ -129,8 +129,11 @@ export class GroupsService {
     });
 
     const groupAsCreator: Array<Groups> = await this.groupsRepository.find(
+      {
+        createdBy: user,
+        uuid : { $ne: 'home' }
+      },
       // @ts-ignore
-      { createdBy: user },
       { fields: ['name', 'uuid', 'createdBy', {createdBy: ['uuid']}] }
       );
 
