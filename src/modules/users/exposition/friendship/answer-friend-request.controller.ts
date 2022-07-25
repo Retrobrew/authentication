@@ -6,9 +6,12 @@ import { AnswerFriendshipRequestDto } from '../../application/dto/friendship/ans
 import {
   AnswerFriendshipRequestService
 } from '../../application/services/Friendship/answer-friendship-request.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
+@ApiTags('Friendship')
 @Controller('friendRequests/received')
 export class AnswerFriendRequestController {
   constructor(

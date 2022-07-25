@@ -24,7 +24,10 @@ import { FindUserDto } from '../application/dto/user/find-user.dto';
 import { UserProfileDto } from '../application/dto/user/user-profile.dto';
 import { Observable, of } from 'rxjs';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiConsumes, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LoginDto } from '../../../libs/Login.dto';
 
+@ApiTags('Users')
 @UsePipes(new ValidationPipe({ transform: true }))
 @Controller('users')
 export class UsersController {
@@ -34,7 +37,11 @@ export class UsersController {
   ) {}
 
   @Post()
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('avatar'))
+  @ApiResponse({
+    type: LoginDto
+  })
   async registration (
     @Body() createUserDto: UserRegistrationDto,
     @UploadedFile() avatar?: Express.Multer.File
@@ -51,6 +58,7 @@ export class UsersController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findAll(
     @Request() request
   ): Promise<Array<FriendDto>> {
@@ -59,6 +67,7 @@ export class UsersController {
 
   @Put(':uuid/email')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   changeEmail(
     @Param('uuid') uuid: string,
     @Body() changeEmailDto: ChangeEmailDto
@@ -70,6 +79,7 @@ export class UsersController {
 
   @Put(':uuid')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   changeIdentity(
     @Param('uuid') uuid: string,
     @Body() changeUsernameDto: ChangeUsernameDto
@@ -81,6 +91,7 @@ export class UsersController {
 
   @Put(':uuid/password')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   changePassword(
     @Param('uuid') uuid: string,
     @Body() changePasswordDto: ChangePasswordDto
@@ -91,12 +102,14 @@ export class UsersController {
   }
 
   @Get(':uuid')
+  //TODO
   findOne(@Param('uuid') uuid: string) {
     return this.usersService.findOne(uuid);
   }
 
   @Get(':uuid/profile')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getUserProfile(
     @Param('uuid') uuid: string,
     @Request() request
@@ -109,15 +122,19 @@ export class UsersController {
 
   @Delete(':uuid')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   remove(@Param('uuid') uuid: string) {
-    this.usersService.findOneByUuid(uuid).then((user) => {
-      this.usersService.remove(user);
-    });
-
+    this.usersService.findOneByUuid(uuid)
+      .then((user) => {
+        this.usersService.remove(user);
+      });
   }
 
   @Get(':uuid/avatar')
-  async getAvatar(@Param('uuid') uuid: string, @Res() res): Promise<Observable<Object>> {
+  @ApiProduces('image/jpeg')
+  async getAvatar(
+    @Param('uuid') uuid: string, @Res() res
+  ): Promise<Observable<Object>> {
     return of(
       res.sendFile(
         `${process.cwd()}/${process.env.USER_STORAGE}${uuid}/avatar.jpg`

@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
 
 async function bootstrap() {
@@ -8,12 +9,19 @@ async function bootstrap() {
     //ici on pourra passer les en-tête cors
   });
 
-  // Va appliquer la stratégie JWT du guard sur toutes les routes de l'appli
-  // const reflector = app.get( Reflector );
-  // app.useGlobalGuards(new JwtAuthGuard(reflector))
+  const config = new DocumentBuilder()
+    .setTitle('Retrobrew API')
+    .setDescription("API de l'application Retrobrew")
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
 
-  // Pas forcément nécessaire de typer
-  // const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  /*const customOptions: SwaggerCustomOptions = {
+    docExpansion: none
+  };*/
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   // Activation des CORS pour le déploiement sur environnement de dev
   app.enableCors({
