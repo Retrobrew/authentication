@@ -44,6 +44,9 @@ export class UsersController {
     @UploadedFile() avatar?: Express.Multer.File
   ) {
     let newUser;
+    if(avatar) {
+      createUserDto.avatar = avatar.buffer;
+    }
     try {
       newUser = await this.usersService.registrate(createUserDto);
     } catch (error) {
