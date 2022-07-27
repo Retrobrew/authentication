@@ -5,8 +5,10 @@ import { Request } from 'express';
 import { FeedPostDto } from '../application/dto/post/feed-post.dto';
 import { Groups } from '../../groups/domain/entities/groups.entity';
 import { GroupsService } from '../../groups/application/services/groups.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @UsePipes(new ValidationPipe({ transform: true }))
+@ApiTags('Feed')
 @Controller('feeds')
 export class FeedsController {
   constructor(
@@ -15,6 +17,7 @@ export class FeedsController {
   ) {
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get("my")
   async getFeed(
@@ -34,6 +37,7 @@ export class FeedsController {
     }
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get("group/:groupUuid")
   async getGroupFeed(

@@ -1,16 +1,23 @@
 import { Transform, TransformFnParams } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateGroupDto {
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value.trim())
   name: string;
 
-  // @IsNotEmpty()
-  // @Transform(({ value }: TransformFnParams) => value.trim())
-  icon: Buffer;
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+  })
+  icon?: Buffer;
 
-  banner: Buffer;
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+  })
+  banner?: Buffer;
 
   description: string;
 

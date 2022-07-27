@@ -1,8 +1,9 @@
+import { User } from '../../../domain/entities/user.entity';
+
 export class UserDto {
   public readonly uuid: string;
   public readonly username: string;
   public readonly picture: string;
-  //doubi
 
   constructor(
     uuid: string,
@@ -12,5 +13,13 @@ export class UserDto {
     this.uuid = uuid;
     this.username = username;
     this.picture = picture;
+  }
+
+  public static createFromUser(user: User): UserDto {
+    return new UserDto(
+      user.getUuid(),
+      user.getUsername(),
+      user.getPicture()
+    );
   }
 }

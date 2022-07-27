@@ -1,5 +1,7 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+
 
 export class UserRegistrationDto {
   @IsNotEmpty()
@@ -31,7 +33,12 @@ export class UserRegistrationDto {
   @IsString()
   password: string;
 
-  avatar: Buffer;
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: "User's avatar as uploaded file",
+  })
+  avatar?: Buffer;
 
 
 }

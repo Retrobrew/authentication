@@ -22,6 +22,8 @@ import * as fs from 'fs';
 import { UploadFileDto } from '../dto/upload-file.dto';
 import { UploadIconDto } from '../dto/upload-icon.dto';
 import { UserDto } from '../../../users/application/dto/friend/user.dto';
+import { FindGroupDto } from '../dto/find-group.dto';
+import { GroupHomeDto } from '../dto/group-home.dto';
 
 export interface UserAndGroup {
   user: User;
@@ -83,12 +85,30 @@ export class GroupsService {
     await this.groupsRepository.removeAndFlush(group);
   }
 
-  async findAll(): Promise<Groups[]> {
-    return await this.groupsRepository.find(
+  async findAll(): Promise<FindGroupDto[]> {
+    const groupDtos = [];
+    const groups = await this.groupsRepository.find(
       { uuid : { $ne: 'home' } },
       // @ts-ignore
       { fields: ['uuid', 'name', 'createdBy',{createdBy: ['uuid']}, 'picture', 'language'] }
     );
+
+    groups.forEach(group => {
+      const creator = group.getCreator();
+      groupDtos.push(new FindGroupDto(
+        group.getUuid(),
+        group.getName(),
+        group.getPicture(),
+        new UserDto(
+          creator.getUuid(),
+          creator.getUsername(),
+          creator.getPicture()
+        ),
+        group.getLanguage()
+      ))
+    });
+
+    return groupDtos;
   }
 
   async find(uuid: string): Promise<Groups> {
@@ -97,6 +117,35 @@ export class GroupsService {
       // @ts-ignore
       { fields: ['uuid', 'name', 'isProject', 'createdBy',{createdBy: ['uuid', 'username', 'picture']}, 'members', 'picture', 'description', 'language'] }
     );
+  }
+
+  async getGroup(uuid: string): Promise<GroupHomeDto> {
+    const group = await this.find(uuid);
+    const creator = group.getCreator();
+    const creatorDto = new UserDto(
+      creator.getUuid(),
+      creator.getUsername(),
+      creator.getPicture()
+    );
+
+    const membersDto = [];
+    group.getMembers().forEach(member => {
+      membersDto.push(new UserDto(
+        member.getUuid(),
+        member.getUsername(),
+        member.getPicture()
+      ));
+    })
+    return new GroupHomeDto(
+      group.getUuid(),
+      group.getName(),
+      group.getPicture(),
+      group.getDescription(),
+      group.isProject,
+      creatorDto,
+      group.getLanguage(),
+      membersDto
+    )
   }
 
   async getUserGroups(userUuid: string): Promise<Array<UserProfileGroupDto>> {
@@ -250,7 +299,6 @@ export class GroupsService {
   }
 
   private async _RequestValid(request: RequestGroup): Promise<UserAndGroup> {
-    // TODO : Autorisation
     const user = await this.userService.findOneByUuid(request.userUuid);
     if (!user) {
       throw new NotFoundException('User not found');

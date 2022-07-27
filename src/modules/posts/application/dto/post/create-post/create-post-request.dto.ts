@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePostRequestDto {
   @IsString()
@@ -13,7 +14,12 @@ export class CreatePostRequestDto {
   @Transform(({ value }: TransformFnParams) => value.trim())
   readonly createdAt: string;
 
-  readonly media: Buffer;
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: "post's picture as uploaded file",
+  })
+  readonly media?: Buffer;
 
   readonly postedIn: string;
 }

@@ -16,8 +16,10 @@ import { EditCommentRequestDto } from '../application/dto/comment/edit-comment/e
 import { EditCommentDto } from '../application/dto/comment/edit-comment/edit-comment.dto';
 import { DeleteCommentDto } from '../application/dto/comment/delete-comment/delete-comment.dto';
 import { PostCommentsDto } from '../application/dto/comment/read-comments/post-comments.dto';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @UsePipes(new ValidationPipe({ transform: true }))
+@ApiTags('Comments')
 @Controller('posts')
 export class CommentsController {
   constructor(
@@ -28,12 +30,15 @@ export class CommentsController {
   async getComments(
     @Param('uuid') postId: string,
   ): Promise<Array<PostCommentsDto>> {
-
     return this.commentsService.getPostComments(postId);
   }
 
   @Post(":uuid/comment")
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({
+    description: "Retourne l'identifiant du commentaire créé"
+  })
   async commentPost(
     @Body() commentPostRequest: CommentPostRequestDto,
     @Param('uuid') postId: string,
@@ -52,6 +57,7 @@ export class CommentsController {
   }
 
   @Put(":postId/comment/:uuid")
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async editComment(
     @Body() editCommentRequest: EditCommentRequestDto,
@@ -69,6 +75,7 @@ export class CommentsController {
   }
 
   @Delete(":postId/comment/:uuid")
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async deleteComment(
     @Param('uuid') comment: string,

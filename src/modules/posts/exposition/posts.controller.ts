@@ -22,8 +22,10 @@ import { Express } from 'express';
 import { PostLikeDto } from '../application/dto/post/post-like.dto';
 import { FeedPostDto } from '../application/dto/post/feed-post.dto';
 import { Observable, of } from 'rxjs';
+import { ApiBearerAuth, ApiConsumes, ApiProduces, ApiTags } from '@nestjs/swagger';
 
 @UsePipes(new ValidationPipe({ transform: true }))
+@ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(
@@ -33,6 +35,8 @@ export class PostsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('media'))
   async createPost(
     @Body() createPostRequest: CreatePostRequestDto,
@@ -52,6 +56,7 @@ export class PostsController {
   }
 
   @Put(":uuid/like")
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async likePost(
     @Req() req: Request,
@@ -64,6 +69,7 @@ export class PostsController {
   }
 
   @Put(":uuid/unlike")
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async unlikePost(
     @Req() req: Request,
@@ -76,6 +82,7 @@ export class PostsController {
   }
 
   @Put(":uuid")
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async editPost(
     @Body() editPostRequest: EditPostRequestDto,
@@ -94,6 +101,7 @@ export class PostsController {
   }
 
   @Get()
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async getPosts(
     @Req() req: Request
@@ -111,6 +119,7 @@ export class PostsController {
   }
 
   @Delete(":uuid")
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async deletePost(
     @Param('uuid') uuid: string,
@@ -124,6 +133,7 @@ export class PostsController {
     return this.postsService.deletePost(deletePostDto);
   }
 
+  @ApiProduces('image/jpeg')
   @Get(':uuid/media')
   async getMedia(@Param('uuid') uuid: string, @Res() res): Promise<Observable<Object>> {
     const post = await this.postsService.getPost(uuid);
