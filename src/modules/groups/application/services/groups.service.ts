@@ -21,6 +21,7 @@ import { UserProfileGroupDto } from '../dto/user-profile-group.dto';
 import * as fs from 'fs';
 import { UploadFileDto } from '../dto/upload-file.dto';
 import { UploadIconDto } from '../dto/upload-icon.dto';
+import { UserDto } from '../../../users/application/dto/friend/user.dto';
 
 export interface UserAndGroup {
   user: User;
@@ -83,9 +84,11 @@ export class GroupsService {
   }
 
   async findAll(): Promise<Groups[]> {
-    return await this.groupsRepository.find({
-      uuid : { $ne: 'home' }
-    });
+    return await this.groupsRepository.find(
+      { uuid : { $ne: 'home' } },
+      // @ts-ignore
+      { fields: ['uuid', 'name', 'createdBy',{createdBy: ['uuid']}, 'picture', 'language'] }
+    );
   }
 
   async find(uuid: string): Promise<Groups> {
@@ -105,10 +108,10 @@ export class GroupsService {
     const groups: Array<UserProfileGroupDto> = [];
 
     const groupAsMember: Array<GroupsMembership> = await this.groupMembership.find(
-      { user: user },
+      { user: user, },
       { fields: [
           // @ts-ignore
-          'id', 'group', { group: ['name', 'uuid'] }
+          'id', 'group', { group: ['name', 'uuid', 'createdBy', {createdBy: ['uuid']}] }
         ]
       });
 
@@ -116,22 +119,33 @@ export class GroupsService {
       const dto = new UserProfileGroupDto(
         membership.getGroup().uuid,
         membership.getGroup().getName(),
-        false
+        false,
+        new UserDto(
+          membership.getGroup().getCreator().getUuid(),
+          membership.getGroup().getCreator().getUsername(),
+        )
       );
       groups.push(dto);
     });
 
     const groupAsCreator: Array<Groups> = await this.groupsRepository.find(
+      {
+        createdBy: user,
+        uuid : { $ne: 'home' }
+      },
       // @ts-ignore
-      { createdBy: user },
-      { fields: ['name', 'uuid'] }
+      { fields: ['name', 'uuid', 'createdBy', {createdBy: ['uuid']}] }
       );
 
     groupAsCreator.forEach((group) => {
       const dto = new UserProfileGroupDto(
         group.uuid,
         group.getName(),
-        true
+        true,
+        new UserDto(
+          group.getCreator().getUuid(),
+          group.getCreator().getUsername(),
+        )
       );
       groups.push(dto);
     })

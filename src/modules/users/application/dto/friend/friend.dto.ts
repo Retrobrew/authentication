@@ -12,18 +12,18 @@ export class FriendDto {
 
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value.trim())
-  public readonly userUuid: string;
+  public readonly uuid: string;
 
 
   constructor(
     username: string,
     picture: string,
     country: string,
-    userUuid: string
+    uuid: string
   ) {
     this.username = username;
     this.picture = picture;
     this.country = country;
-    this.userUuid = userUuid;
+    this.uuid = uuid;
   }
 }

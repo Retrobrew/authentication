@@ -24,6 +24,8 @@ import { FindUserDto } from '../application/dto/user/find-user.dto';
 import { UserProfileDto } from '../application/dto/user/user-profile.dto';
 import { Observable, of } from 'rxjs';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FriendshipService } from '../application/services/Friendship/friendship.service';
+import { GroupsService } from '../../groups/application/services/groups.service';
 import { ApiBearerAuth, ApiConsumes, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '../../../libs/Login.dto';
 
@@ -33,7 +35,9 @@ import { LoginDto } from '../../../libs/Login.dto';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly authService: AuthenticationService
+    private readonly friendshipService: FriendshipService,
+    private readonly authService: AuthenticationService,
+    private readonly groupsService: GroupsService
   ) {}
 
   @Post()
@@ -47,6 +51,9 @@ export class UsersController {
     @UploadedFile() avatar?: Express.Multer.File
   ) {
     let newUser;
+    if(avatar) {
+      createUserDto.avatar = avatar.buffer;
+    }
     try {
       newUser = await this.usersService.registrate(createUserDto);
     } catch (error) {
@@ -118,6 +125,19 @@ export class UsersController {
     const findUserDto = new FindUserDto(userId, uuid)
 
     return this.usersService.getUserProfile(findUserDto);
+  }
+  @Get(':uuid/friends')
+  @UseGuards(JwtAuthGuard)
+  getUserFriends(
+    @Param('uuid') uuid: string,
+  ): Promise<FriendDto[]> {
+    return this.friendshipService.getFriends(uuid);
+  }
+
+  @Get(':uuid/groups')
+  @UseGuards(JwtAuthGuard)
+  getUserGroups(@Param('uuid') uuid: string) {
+    return this.groupsService.getUserGroups(uuid);
   }
 
   @Delete(':uuid')
