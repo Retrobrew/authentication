@@ -28,6 +28,7 @@ import { FriendshipService } from '../application/services/Friendship/friendship
 import { GroupsService } from '../../groups/application/services/groups.service';
 import { ApiBearerAuth, ApiConsumes, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from '../../../libs/Login.dto';
+import { UserSimpleProfileDto } from '../application/dto/user/user-simple-profile.dto';
 
 @ApiTags('Users')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -109,8 +110,7 @@ export class UsersController {
   }
 
   @Get(':uuid')
-  //TODO
-  findOne(@Param('uuid') uuid: string) {
+  findOne(@Param('uuid') uuid: string): Promise<UserSimpleProfileDto> {
     return this.usersService.findOne(uuid);
   }
 

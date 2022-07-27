@@ -8,6 +8,7 @@ import { User } from '../../domain/entities/user.entity';
 import { UserRepository } from '../../application/user.repository';
 import { FriendRequestService } from '../../application/services/Friendship/friend-request.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { FriendRequestDto } from '../../application/dto/friendship/friend-request.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @UseGuards(JwtAuthGuard)
@@ -25,14 +26,12 @@ export class GetFriendRequestsController {
   }
 
   @Get('received')
-  //TODO DTO
-  async getReceivedRequests(@Req() request: Request): Promise<FriendRequest[]> {
+  async getReceivedRequests(@Req() request: Request): Promise<FriendRequestDto[]> {
     return this.friendRequestService.getReceivedRequests(request.user['userId']);
   }
 
   @Get('sent')
-  //TODO Dto
-  async getSentRequests(@Req() request: Request): Promise<FriendRequest[]> {
+  async getSentRequests(@Req() request: Request): Promise<FriendRequestDto[]> {
     return this.friendRequestService.getSentRequests(request.user['userId']);
   }
 }

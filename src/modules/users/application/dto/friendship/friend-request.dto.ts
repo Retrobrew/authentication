@@ -1,8 +1,8 @@
 import { UserDto } from '../friend/user.dto';
 
 export class FriendRequestDto {
-  public readonly requestId: number;
-  public readonly requesterDto: UserDto;
+  public readonly id: number;
+  public readonly requester: UserDto;
   public readonly sentAt: Date;
   public readonly status: string;
 
@@ -13,8 +13,8 @@ export class FriendRequestDto {
     sentAt: Date,
     status: string
   ) {
-    this.requestId = requestId;
-    this.requesterDto = requesterDto;
+    this.id = requestId;
+    this.requester = requesterDto;
     this.sentAt = sentAt;
     this.status = status;
   }

@@ -17,10 +17,11 @@ import { GroupsService } from '../../groups/application/services/groups.service'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { ChangeAvatarDto } from '../application/dto/user/change-avatar.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FriendDto } from '../application/dto/friend/friend.dto';
 import { UserProfileGroupDto } from '../../groups/application/dto/user-profile-group.dto';
 import { FileUploadDto } from '../../../libs/FileUpload.dto';
+import { UserSimpleProfileDto } from '../application/dto/user/user-simple-profile.dto';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @UseGuards(JwtAuthGuard)
@@ -35,9 +36,18 @@ export class UsersProfileController {
   ) {}
 
   @Get('profile')
-  //TODO
-  async profile(@Request() req) {
-    return this.usersService.findOneByUuid(req.user['userId']);
+  async profile(@Request() req): Promise<UserSimpleProfileDto> {
+    const user = await this.usersService.findOneByUuid(req.user['userId']);
+
+    return new UserSimpleProfileDto(
+      user.getUuid(),
+      user.getEmail(),
+      user.getUsername(),
+      user.getDateOfBirth(),
+      user.getGender(),
+      user.getCountry(),
+      user.getPicture(),
+    );
   }
 
   @Get('my/friends')

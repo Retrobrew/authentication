@@ -27,6 +27,8 @@ import { UploadFileDto } from '../application/dto/upload-file.dto';
 import { UploadIconDto } from '../application/dto/upload-icon.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { FileUploadDto } from '../../../libs/FileUpload.dto';
+import { FindGroupDto } from '../application/dto/find-group.dto';
+import { GroupHomeDto } from '../application/dto/group-home.dto';
 
 @UsePipes(
   new ValidationPipe({
@@ -41,8 +43,7 @@ export class GroupController {
   @Get()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  //TODO
-  async getALl(): Promise<Groups[]> {
+  async getALl(): Promise<FindGroupDto[]> {
     try {
       return await this.groupsService.findAll();
     } catch (error) {
@@ -53,10 +54,9 @@ export class GroupController {
   @Get(':uuid')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  //TODO dto
-  async get(@Param('uuid') uuid: string): Promise<Groups> {
+  async get(@Param('uuid') uuid: string): Promise<GroupHomeDto> {
     try {
-      return await this.groupsService.find(uuid);
+      return await this.groupsService.getGroup(uuid);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

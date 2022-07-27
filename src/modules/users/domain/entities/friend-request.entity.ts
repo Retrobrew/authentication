@@ -51,4 +51,8 @@ export class FriendRequest {
   public updateStatus(status: string): void {
     this.status = status;
   }
+
+  public getSentAt(): Date {
+    return this.sentAt;
+  }
 }
