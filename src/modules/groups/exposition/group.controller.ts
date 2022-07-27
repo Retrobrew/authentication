@@ -25,19 +25,25 @@ import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express
 import { Observable, of } from 'rxjs';
 import { UploadFileDto } from '../application/dto/upload-file.dto';
 import { UploadIconDto } from '../application/dto/upload-icon.dto';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiProduces, ApiTags } from '@nestjs/swagger';
+import { FileUploadDto } from '../../../libs/FileUpload.dto';
+import { FindGroupDto } from '../application/dto/find-group.dto';
+import { GroupHomeDto } from '../application/dto/group-home.dto';
 
 @UsePipes(
   new ValidationPipe({
     transform: true,
   }),
 )
+@ApiTags('Groups')
 @Controller('groups/')
 export class GroupController {
   constructor(private readonly groupsService: GroupsService) {}
 
   @Get()
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getALl(): Promise<Groups[]> {
+  async getALl(): Promise<FindGroupDto[]> {
     try {
       return await this.groupsService.findAll();
     } catch (error) {
@@ -46,10 +52,11 @@ export class GroupController {
   }
 
   @Get(':uuid')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async get(@Param('uuid') uuid: string): Promise<Groups> {
+  async get(@Param('uuid') uuid: string): Promise<GroupHomeDto> {
     try {
-      return await this.groupsService.find(uuid);
+      return await this.groupsService.getGroup(uuid);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -57,6 +64,8 @@ export class GroupController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileFieldsInterceptor([
     { name: 'icon', maxCount: 1 },
     { name: 'banner', maxCount: 1 },
@@ -87,6 +96,7 @@ export class GroupController {
   }
 
   @Put()
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @HttpCode(202)
   async update(@Body() modifyGroupDto: ModifyGroupDto) {
@@ -98,6 +108,7 @@ export class GroupController {
   }
 
   @Delete(':uuid')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @HttpCode(202)
   async remove(
@@ -115,6 +126,7 @@ export class GroupController {
   }
 
   @Post(':groupUuid/join')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @HttpCode(202)
   async join(
@@ -132,6 +144,7 @@ export class GroupController {
   }
 
   @Post(':groupUuid/quit')
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @HttpCode(202)
   async quit(
@@ -151,6 +164,11 @@ export class GroupController {
 
   @Post(':groupUuid/icon')
   @UseInterceptors(FileInterceptor('icon'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth()
+  @ApiBody({
+    type: FileUploadDto
+  })
   @UseGuards(JwtAuthGuard)
   @HttpCode(202)
   async uploadIcon(
@@ -173,6 +191,7 @@ export class GroupController {
     }
   }
 
+  @ApiProduces('image/jpeg')
   @Get(':groupUuid/icon')
   async getIcon(@Param('groupUuid') uuid: string, @Res() res): Promise<Observable<Object>> {
     return of(
@@ -182,6 +201,7 @@ export class GroupController {
     )
   }
 
+  @ApiProduces('image/jpeg')
   @Get(':groupUuid/banner')
   async getBanner(@Param('groupUuid') uuid: string, @Res() res): Promise<Observable<Object>> {
     return of(

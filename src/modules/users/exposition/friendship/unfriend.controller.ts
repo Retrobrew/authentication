@@ -15,9 +15,12 @@ import { UserRepository } from '../../application/user.repository';
 import { EntityRepository } from '@mikro-orm/mysql';
 import { Friendship } from '../../domain/entities/friendship.entity';
 import { FriendshipService } from '../../application/services/Friendship/friendship.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @UsePipes(new ValidationPipe({ transform: true }))
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
+@ApiTags('Friendship')
 @Controller()
 export class UnfriendController {
   constructor(

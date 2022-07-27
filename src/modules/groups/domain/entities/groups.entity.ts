@@ -88,4 +88,16 @@ export class Groups {
   public getUuid(): string {
     return this.uuid;
   }
+
+  public getPicture(): string {
+    return this.picture;
+  }
+
+  public getLanguage(): string {
+    return this.language;
+  }
+
+  public getDescription(): string {
+    return this.description;
+  }
 }

@@ -42,7 +42,6 @@ export class AnswerFriendshipRequestService {
   }
 
   async decline(answerDto: AnswerFriendshipRequestDto){
-    //TODO ajouter un temps avant que requester puisse refaire une demande
     const user: User        = await this.getUser(answerDto.userUuid);
     const friendshipRequest = this.getFriendshipRequest(user, answerDto.requestId);
 

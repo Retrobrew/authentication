@@ -68,7 +68,7 @@ pipeline{
                 withCredentials([usernamePassword(credentialsId: 'RETROBREW_BACK_PROD', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
                     nodejs(nodeJSInstallationName: 'nodejs'){
                         sh('sshpass -p ${PASSWORD} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P 22 -r ./src ./*.json ./*.ts ${USERNAME}@192.168.1.21:/home/prod/back/.')
-                        sh('sshpass -p ${PASSWORD} ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22 ${USERNAME}@192.168.1.21 "cd /home/prod/back/ && npm install && npm run db:update && npm run build && pm2 restart all"')
+                        sh('sshpass -p ${PASSWORD} ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 22 ${USERNAME}@192.168.1.21 "cd /home/prod/back/ && npm install && npm run db:update && nest build && pm2 restart all"')
                     }
                 }
             }

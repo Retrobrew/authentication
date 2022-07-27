@@ -15,6 +15,7 @@ import { EntityRepository } from '@mikro-orm/mysql';
 import { UserProfileDto } from '../dto/user/user-profile.dto';
 import { ChangeAvatarDto } from '../dto/user/change-avatar.dto';
 import * as fs from 'fs';
+import { UserSimpleProfileDto } from '../dto/user/user-simple-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -142,22 +143,31 @@ export class UsersService {
   }
 
   async findOneByUuid(uuid: string): Promise<User | undefined> {
-    // @ts-ignore
     return await this.userRepository.findOne(
       { uuid: uuid },
       {
         // @ts-ignore
-        fields: ['uuid', 'username', 'dateOfBirth', 'picture', 'sexe', 'country', 'friends', 'email'],
+        fields: ['uuid', 'username', 'dateOfBirth', 'picture', 'sexe', 'country', 'email'],
         // @ts-ignore
         populate: ['friends.friendB.uuid']
       });
   }
 
-  async findOne(uuid: string): Promise<User | undefined> {
-    return await this.userRepository.findOne(
+  async findOne(uuid: string): Promise<UserSimpleProfileDto | undefined> {
+    const user = await this.userRepository.findOne(
       { uuid: uuid },
       // @ts-ignore
       { fields: ['uuid', 'username', 'dateOfBirth', 'picture', 'sexe', 'country']}
+    );
+
+    return new UserSimpleProfileDto(
+      user.getUuid(),
+      "",
+      user.getUsername(),
+      user.getDateOfBirth(),
+      user.getGender(),
+      user.getCountry(),
+      user.getPicture()
     );
   }
 

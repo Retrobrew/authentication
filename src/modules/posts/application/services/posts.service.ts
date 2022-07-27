@@ -220,7 +220,7 @@ export class PostsService {
     return feedPosts;
   }
 
-  async getGroupFeed(group: Groups, userUuid: string){
+  async getGroupFeed(group: Groups, userUuid: string): Promise<FeedPostDto[]>{
     const user: User = await this.userRepository.findOneByUuid(userUuid);
     const posts = await this.postsRepository.getGroupFeed(group);
     const feedPosts: Array<FeedPostDto> = [];
