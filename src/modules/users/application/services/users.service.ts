@@ -147,7 +147,9 @@ export class UsersService {
       { uuid: uuid },
       {
         // @ts-ignore
-        fields: ['uuid', 'username', 'dateOfBirth', 'picture', 'sexe', 'country', 'email']
+        fields: ['uuid', 'username', 'dateOfBirth', 'picture', 'sexe', 'country', 'email'],
+        // @ts-ignore
+        populate: ['friends.friendB.uuid']
       });
   }
 
